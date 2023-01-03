@@ -1,12 +1,13 @@
 {
   "name": "my-app",
   "scripts": {
-    "dev": "nuxt",
-    "build": "nuxt build",
-    "generate": "nuxt generate",
-    "start": "nuxt start"
+    "dev": "nuxi dev",
+    "build": "nuxi build",
+    "generate": "nuxi generate",
+    "start": "nuxi start"
   },
   "dependencies": {
+    "firebase": "^9.15.0",
     "nuxt": "^3.0.0"
   }
 }
