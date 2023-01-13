@@ -1,7 +1,25 @@
 <template>
   <div>
-    <form id="login-form" class="mx-auto my-5" @submit.prevent="signIn(user)">
-      <h2 class="text-center">Log in</h2>       
+    <form id="signup-form" class="mx-auto my-5" @submit.prevent="signUp(user)">
+      <h2 class="text-center">Sign up</h2>
+      <div class="form-group pb-3">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="First Name"
+          required="required"
+          v-model="user.fname"
+        />
+      </div>
+      <div class="form-group pb-3">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Last Name"
+          required="required"
+          v-model="user.lname"
+        />
+      </div>    
       <div class="form-group pb-3">
         <input
           type="email"
@@ -22,11 +40,11 @@
       </div>
       <div class="form-group pb-3 text-center">
         <button type="submit" class="btn btn-primary btn-block">
-          Log in
+          Sign Up
         </button>
       </div>
       <div class="text-center">
-        <nuxt-link to="/login?signup=true">Get card</nuxt-link>
+          <nuxt-link to="/login">login</nuxt-link>
       </div>
       <div class="clearfix text-center">
         <span class="text-danger">{{ errorCode }}</span>
@@ -37,22 +55,28 @@
 <script setup>
 
   const user = ref({
+    fname: '',
+    lname: '',
     email: null,
     password: null,
   });
   const errorCode = ref(null);
+  
+  const fullName = computed({
+    get() {
+      return user.value.fname + ' ' + user.value.lname;
+    },
+    set(newVal) {
+      newVal;
+    }
+  })
 
-  async function signIn(user) {
-    const credentials = await signInUser(user.email, user.password);
-    if (credentials) {
-      return navigateTo({
-        path: '/profile'
-      });
-    } else errorCode.value = 'User not found';
+  async function signUp(user) {
+    const credentials = await createUser(user.email, user.password, fullName.value);
   };
 </script>
 <style lang="scss">
-#login-form {
+#signup-form {
   max-width: 340px;
 }
 </style>
