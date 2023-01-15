@@ -2,3 +2,6 @@ node_modules
 dist
 .nuxt
 .output
+.env
+firebase.txt
+just-tap-cards-firebase-adminsdk

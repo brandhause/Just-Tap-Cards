@@ -35,6 +35,7 @@
   </div>
 </template>
 <script setup>
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
   const user = ref({
     email: null,
@@ -43,12 +44,12 @@
   const errorCode = ref(null);
 
   async function signIn(user) {
-    const credentials = await signInUser(user.email, user.password);
-    if (credentials) {
-      return navigateTo({
-        path: '/profile'
+    const { auth } = useFirebase();
+    const cred = await signInWithEmailAndPassword(auth, user.email, user.password)
+      .catch((err) => {
+        errorCode.value = err.message;
       });
-    } else errorCode.value = 'User not found';
+    if (cred) return navigateTo({ path: '/profile' });
   };
 </script>
 <style lang="scss">

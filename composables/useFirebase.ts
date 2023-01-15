@@ -1,54 +1,25 @@
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  onAuthStateChanged,
-} from 'firebase/auth';
+import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 
-import { getFirestore, doc, setDoc } from 'firebase/firestore';
+export const useFirebase = () => {
+  const firebaseConfig = {
+    apiKey: "AIzaSyAF2TateJZxI-_-whF8eBcuK1NTYWm6OW0",
+    authDomain: "just-tap-cards.firebaseapp.com",
+    projectId: "just-tap-cards",
+    storageBucket: "just-tap-cards.appspot.com",
+    messagingSenderId: "876543061009",
+    appId: "1:876543061009:web:0a9cc4aa6ee0e9810395b0",
+    measurementId: "G-WLLC5813ML"
+  };
 
-export const createUser = async (email, password, name) => {
-  const auth = getAuth();
-  const firestore = getFirestore();
+  const firebaseApp = initializeApp(firebaseConfig);
+  const firestore = getFirestore(firebaseApp);
+  const auth = getAuth(firebaseApp);
 
-  const credentials = await createUserWithEmailAndPassword(
+  return {
+    firebaseApp,
+    firestore,
     auth,
-    email,
-    password
-  ).then(async (res) => {
-    // set data to collection users using firebase auth uid
-    await setDoc(doc(firestore, 'users', res.user.uid), {
-      displayName: name,
-      email: res.user.email,
-      emailVerified: res.user.emailVerified,
-    }).catch((err) => console.log('setDoc: ', err.code, err.message));
-  }).catch((err) => console.log('createUser', err.code, err.message));
-  
-  return credentials;
-}
-
-export const signInUser = async (email, password) => {
-  const auth = getAuth();
-  const credentials = await signInWithEmailAndPassword(
-    auth,
-    email,
-    password
-  ).catch((err) => {
-    console.log('signInUser', err.code, err.message)
-  });
-  return credentials;
-}
-
-export const initUser = () => {
-  const auth = getAuth();
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      console.log(user);
-    }
-  });
-}
-
-export const signOutUser = async () => {
-  const auth = getAuth();
-  await auth.signOut();
+  }
 }

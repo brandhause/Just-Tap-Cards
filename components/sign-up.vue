@@ -53,6 +53,8 @@
   </div>
 </template>
 <script setup>
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
 
   const user = ref({
     fname: '',
@@ -72,7 +74,25 @@
   })
 
   async function signUp(user) {
-    const credentials = await createUser(user.email, user.password, fullName.value);
+    const { auth, firestore } = useFirebase();
+
+    const credentials = await createUserWithEmailAndPassword(auth, user.email, user.password)
+      .then((userCredential) => {
+        return userCredential;
+      })
+      .catch((error) => {
+        errorCode.value = error.message;
+      });
+
+    if (credentials) {
+      await setDoc(doc(firestore, 'users', credentials.user.uid), {
+        displayName: fullName.value,
+        email: user.email,
+        emailVerified: credentials.user.emailVerified,
+      }).catch((error) => {
+        console.log(error.message);
+      });
+    }
   };
 </script>
 <style lang="scss">
