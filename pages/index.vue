@@ -1,9 +1,12 @@
 <template>
   <div class="text-center">
     <h1>Hello {{ currentUser ? currentUser.displayName : 'World' }}!</h1>
-    <div>
-      <nuxt-link to="/login" v-if="!currentUser">Login</nuxt-link>
-      <nuxt-link to="/profile" v-if="currentUser">Go to profile</nuxt-link>
+    <div v-show="!currentUser">
+      <UserSignIn v-if="!getQuery"></UserSignIn>
+      <UserSignUp v-if="getQuery"></UserSignUp>
+    </div>
+    <div v-show="currentUser">
+      <nuxt-link to="/profile">View Profile</nuxt-link>
     </div>
   </div>
 </template>
@@ -12,6 +15,13 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { doc, onSnapshot } from "firebase/firestore";
 
   const currentUser = ref();
+
+  const route = useRoute();
+
+  const getQuery = computed(() => {
+    if (!route && !route.query) return false;
+    return route.query.signup;
+  });
 
   onMounted(async () => {
     const { auth, firestore } = useFirebase();

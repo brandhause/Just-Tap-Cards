@@ -26,7 +26,7 @@
         </button>
       </div>
       <div class="text-center">
-        <nuxt-link to="/login?signup=true">Get card</nuxt-link>
+        <nuxt-link to="/?signup=true">Get card</nuxt-link>
       </div>
       <div class="clearfix text-center">
         <span class="text-danger">{{ errorCode }}</span>

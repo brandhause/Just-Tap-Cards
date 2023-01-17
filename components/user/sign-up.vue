@@ -44,7 +44,7 @@
         </button>
       </div>
       <div class="text-center">
-          <nuxt-link to="/login">login</nuxt-link>
+          <nuxt-link to="/">login</nuxt-link>
       </div>
       <div class="clearfix text-center">
         <span class="text-danger">{{ errorCode }}</span>
