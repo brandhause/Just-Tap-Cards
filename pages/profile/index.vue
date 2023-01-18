@@ -4,6 +4,11 @@
       <nuxt-link to="/">Home</nuxt-link>
     </div>
     <div>
+      <div class="mx-auto" style="width: 375px; height: 211px">
+        <img :src="currentUser.profileImage" />
+      </div>
+    </div>
+    <div>
       Hello {{ currentUser.displayName }}!
       <button @click="toggleEdit = !toggleEdit">
         {{ toggleEdit ? 'Cancel' : 'Edit' }}

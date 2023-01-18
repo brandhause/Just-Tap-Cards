@@ -1,12 +1,12 @@
 <template>
   <div class="text-center">
     <h1>Hello {{ currentUser ? currentUser.displayName : 'World' }}!</h1>
+    <div v-show="currentUser">
+      <nuxt-link to="/profile">View Profile</nuxt-link>
+    </div>
     <div v-show="!currentUser">
       <UserSignIn v-if="!getQuery"></UserSignIn>
       <UserSignUp v-if="getQuery"></UserSignUp>
-    </div>
-    <div v-show="currentUser">
-      <nuxt-link to="/profile">View Profile</nuxt-link>
     </div>
   </div>
 </template>
@@ -28,6 +28,7 @@ import { doc, onSnapshot } from "firebase/firestore";
 
     onAuthStateChanged(auth, (user) => {
       if (user) {
+        delete route.query;
         const docRef = doc(firestore, 'users', user.uid);
         onSnapshot(docRef,
           (snap) => {
