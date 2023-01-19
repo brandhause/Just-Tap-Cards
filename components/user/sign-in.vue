@@ -26,7 +26,7 @@
         </button>
       </div>
       <div class="text-center">
-        <nuxt-link to="/login?signup=true">Get card</nuxt-link>
+        <nuxt-link :to="{ name: 'index', query: { signup: true } }">Get card</nuxt-link>
       </div>
       <div class="clearfix text-center">
         <span class="text-danger">{{ errorCode }}</span>
@@ -35,6 +35,7 @@
   </div>
 </template>
 <script setup>
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
   const user = ref({
     email: null,
@@ -43,12 +44,12 @@
   const errorCode = ref(null);
 
   async function signIn(user) {
-    const credentials = await signInUser(user.email, user.password);
-    if (credentials) {
-      return navigateTo({
-        path: '/profile'
+    const { auth } = useFirebase();
+    const cred = await signInWithEmailAndPassword(auth, user.email, user.password)
+      .catch((err) => {
+        errorCode.value = err.message;
       });
-    } else errorCode.value = 'User not found';
+    if (cred) return navigateTo({ path: '/profile' });
   };
 </script>
 <style lang="scss">
