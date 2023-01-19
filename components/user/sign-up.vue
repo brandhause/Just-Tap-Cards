@@ -98,62 +98,62 @@ import { uploadBytesResumable, getDownloadURL, ref as storageRef } from "firebas
         errorCode.value = error.message;
       });
     
+    if (credentials) {
     // upload image to firebase storage
-    const metadata = {
-        contentType: user.file.type,
-      };
+      const metadata = {
+          contentType: user.file.type,
+        };
 
-    const imgRef = storageRef(storage, `images/${user.file.name}`);
-    const uploadTask = uploadBytesResumable(imgRef, user.file, metadata);
-    
-    uploadTask.on('state_changed',
-      (snapshot) => {
-        // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        console.log('Upload is ' + progress + '% done');
-        switch (snapshot.state) {
-          case 'paused':
-            console.log('Upload is paused');
-            break;
-          case 'running':
-            console.log('Upload is running');
-            break;
-        }
-      }, 
-      (error) => {
-        // A full list of error codes is available at
-        // https://firebase.google.com/docs/storage/web/handle-errors
-        switch (error.code) {
-          case 'storage/unauthorized':
-            // User doesn't have permission to access the object
-            break;
-          case 'storage/canceled':
-            // User canceled the upload
-            break;
-          case 'storage/unknown':
-            // Unknown error occurred, inspect error.serverResponse
-            break;
-        }
-      }, 
-      () => {
-        // Upload completed successfully, now we can get the download URL
-        getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
-          
-          // Set data to users collection
-          if (credentials) {
-            await setDoc(doc(firestore, 'users', credentials.user.uid), {
-              displayName: fullName.value,
-              email: credentials.user.email,
-              emailVerified: credentials.user.emailVerified,
-              profileImage: downloadURL,
-            }).catch((error) => {
-              console.log(error.message);
-            });
+      const imgRef = storageRef(storage, `images/${credentials.user.uid}/${user.file.name}`);
+      const uploadTask = uploadBytesResumable(imgRef, user.file, metadata);
+      
+      uploadTask.on('state_changed',
+        (snapshot) => {
+          // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          console.log('Upload is ' + progress + '% done');
+          switch (snapshot.state) {
+            case 'paused':
+              console.log('Upload is paused');
+              break;
+            case 'running':
+              console.log('Upload is running');
+              break;
           }
+        }, 
+        (error) => {
+          // A full list of error codes is available at
+          // https://firebase.google.com/docs/storage/web/handle-errors
+          switch (error.code) {
+            case 'storage/unauthorized':
+              // User doesn't have permission to access the object
+              break;
+            case 'storage/canceled':
+              // User canceled the upload
+              break;
+            case 'storage/unknown':
+              // Unknown error occurred, inspect error.serverResponse
+              break;
+          }
+        }, 
+        () => {
+          // Upload completed successfully, now we can get the download URL
+          getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
+            
+            // Set data to users collection
+              await setDoc(doc(firestore, 'users', credentials.user.uid), {
+                displayName: fullName.value,
+                email: credentials.user.email,
+                emailVerified: credentials.user.emailVerified,
+                profileImage: downloadURL,
+              }).catch((error) => {
+                console.log(error.message);
+              });
 
-        });
-      }
-    );
+          });
+        }
+      );
+    }
   };
 </script>
 <style lang="scss">
