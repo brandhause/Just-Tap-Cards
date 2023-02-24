@@ -51,7 +51,6 @@ import { doc, onSnapshot, updateDoc } from "firebase/firestore";
   }
 
   async function edit(user) {
-    console.log(user);
     const { firestore } = useFirebase();
     const fullName = `${user.fname} ${user.lname}`;
     await updateDoc(doc(firestore, 'users', currentUser.value.uid), {

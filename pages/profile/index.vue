@@ -2,17 +2,24 @@
   <div v-if="currentUser">
     <div class="container my-5">
       <div class="row justify-content-center">
-        <div class="col-md-4">
+        <div class="col-md-5">
           <div>
             <nuxt-link to="/">Home</nuxt-link>
           </div>
-          <div>
-            <div class="mx-auto" style="width: 100%; height: auto">
+          Hello {{ currentUser.displayName }}!
+          <div class="profile-details">
+            <div class="profile-img mx-auto" style="width: 100%; height: auto">
               <img :src="currentUser.profileImage" />
+            </div>
+            <div class="profile-info">
+              <h2>{{ currentUser.displayName }}</h2>
+              <p>
+                <span class="job-title">{{ currentUser.jobTitle }}</span>
+                <span v-if="currentUser.company"> At {{ currentUser.company }}</span>
+                </p>
             </div>
           </div>
           <div>
-            Hello {{ currentUser.displayName }}!
             <nuxt-link to="/profile/edit-card-details">Edit profile</nuxt-link>
           </div>
           <div class="user-bio">
