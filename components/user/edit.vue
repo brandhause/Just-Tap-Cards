@@ -45,7 +45,7 @@
       lname: fullName.value[1],
       jobTitle: props.currentUser.jobTitle,
       company: props.currentUser.company,
-      categoryOfWork: props.currentUser.categoryOfWork
+      categoryOfWork: props.currentUser.industryOrCategoryOfWork
     };
   });
   
