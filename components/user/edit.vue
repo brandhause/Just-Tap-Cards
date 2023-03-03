@@ -1,6 +1,7 @@
 <template>
   <div>
     <form @submit.prevent="edit(user)">
+      <ImageUpload :uploadImage="uploadImage" />
       <div>
         <label for="first-name">First name:</label>
         <input type="text" id="first-name" name="first-name" class="form-control mb-3" v-model="user.fname" />
@@ -39,13 +40,22 @@
     return props.currentUser.displayName.split(' ');
   })
 
+  function uploadImage(e) {
+		user.value.file = e.target.files[0];
+		const reader = new FileReader();
+		reader.onload = () => {
+			document.querySelector('#image-display').style.backgroundImage = `url(${reader.result})`
+		};
+		reader.readAsDataURL(user.value.file);
+	}
+
   onMounted(() => {
     user.value = {
       fname: fullName.value[0],
       lname: fullName.value[1],
       jobTitle: props.currentUser.jobTitle,
       company: props.currentUser.company,
-      categoryOfWork: props.currentUser.industryOrCategoryOfWork
+      categoryOfWork: props.currentUser.industryOrCategoryOfWork,
     };
   });
   

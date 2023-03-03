@@ -45,11 +45,6 @@ import { doc, onSnapshot, updateDoc } from "firebase/firestore";
     });
   })
 
-  async function logout() {
-    const { auth } = useFirebase();
-    await auth.signOut();
-  }
-
   async function edit(user) {
     const { firestore } = useFirebase();
     const fullName = `${user.fname} ${user.lname}`;

@@ -34,7 +34,7 @@ s<template>
             <UserSocialMedia />
           </div>
           <div class="video">
-            <div ref="playerContainer"></div>
+            <UserVideo :currentUser="currentUser" />
           </div>
           <div>
             <button @click="logout">Logout</button>
@@ -80,10 +80,6 @@ import { ref, onMounted } from "vue";
         );
       }
     });
-
-    // userFirstName = fullName.value[0];
-    // userLastName = fullName.value[1];
-
   })
 
   async function logout() {
