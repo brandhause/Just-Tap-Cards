@@ -28,7 +28,6 @@ import { doc, onSnapshot } from "firebase/firestore";
 
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        delete route.query;
         const docRef = doc(firestore, 'users', user.uid);
         onSnapshot(docRef,
           (snap) => {
