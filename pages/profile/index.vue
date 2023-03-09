@@ -36,6 +36,9 @@ s<template>
           <div class="video">
             <UserVideo :currentUser="currentUser" />
           </div>
+          <div class="links">
+            <UserLinks :currentUser="currentUser" />
+          </div>
           <div>
             <button @click="logout">Logout</button>
           </div>
