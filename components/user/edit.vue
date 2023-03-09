@@ -1,15 +1,28 @@
 <template>
   <div>
     <form @submit.prevent="edit(user)">
+      <ImageUpload :uploadImage="uploadImage" />
       <div>
-        <input type="text" @change="dataChanged = true" placeholder="First Name" v-model="user.fname" />
+        <label for="first-name">First name:</label>
+        <input type="text" id="first-name" name="first-name" class="form-control mb-3" v-model="user.fname" />
       </div>
       <div>
-        <input type="text" @change="dataChanged = true" placeholder="Last Name" v-model="user.lname" />
+        <label for="last-name">Last name:</label>
+        <input type="text" id="last-name" name="last-name" class="form-control mb-3" v-model="user.lname" />
       </div>
-      <div v-if="dataChanged">
-        <button type="submit" @click="hideSave">Save</button>
+      <div>
+        <label for="job-title">Job title:</label>
+        <input type="text" id="job-title" name="job-title" class="form-control mb-3" v-model="user.jobTitle" />
       </div>
+      <div>
+        <label for="company">Company:</label>
+        <input type="text" id="company" name="company" class="form-control mb-3" v-model="user.company" />
+      </div>
+      <div>
+        <label for="category-work">Industry or Category of work:</label>
+        <input type="text" id="category-work" name="category-work" class="form-control mb-3" v-model="user.categoryOfWork" />
+      </div>
+      <button class="save-btn" type="submit" @click="hideSave">Save</button>
     </form>
   </div>
 </template>
@@ -21,23 +34,28 @@
   });
 
   const user = ref({});
-  const dataChanged = ref(false);
 
   const fullName = computed(() => {
     if (!props.currentUser && !props.currentUser.displayName) return [];
     return props.currentUser.displayName.split(' ');
   })
 
-  function hideSave() {
-    setTimeout(() => {
-      dataChanged.value = false;
-    }, 500);
-  }
+  function uploadImage(e) {
+		user.value.file = e.target.files[0];
+		const reader = new FileReader();
+		reader.onload = () => {
+			document.querySelector('#image-display').style.backgroundImage = `url(${reader.result})`
+		};
+		reader.readAsDataURL(user.value.file);
+	}
 
   onMounted(() => {
     user.value = {
       fname: fullName.value[0],
       lname: fullName.value[1],
+      jobTitle: props.currentUser.jobTitle,
+      company: props.currentUser.company,
+      categoryOfWork: props.currentUser.industryOrCategoryOfWork,
     };
   });
   

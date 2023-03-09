@@ -1,4 +1,4 @@
-<template>
+dd<template>
   <div>
     <form id="signup-form" class="mx-auto my-5" @submit.prevent="signUp(user)">
       <h2 class="text-center">Sign up</h2>
@@ -40,12 +40,12 @@
         />
       </div>
       <div class="form-group pb-3 text-center">
-        <button type="submit" class="btn btn-primary btn-block">
+        <button type="submit" class="login-btn">
           Sign Up
         </button>
       </div>
       <div class="text-center">
-          <nuxt-link to="/">login</nuxt-link>
+          <nuxt-link class="login-link" to="/">Login</nuxt-link>
       </div>
       <div class="clearfix text-center">
         <span class="text-danger">{{ errorCode }}</span>
@@ -157,7 +157,12 @@ import { uploadBytesResumable, getDownloadURL, ref as storageRef } from "firebas
   };
 </script>
 <style lang="scss">
-#signup-form {
-  max-width: 340px;
-}
+  #signup-form {
+    max-width: 340px;
+  }
+  .login-link {
+      font-size: 18px;
+      color: #42abe0;
+      text-decoration: none;
+  }
 </style>

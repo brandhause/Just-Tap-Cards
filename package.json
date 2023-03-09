@@ -7,11 +7,15 @@
     "start": "nuxi start"
   },
   "dependencies": {
+    "@vimeo/player": "^2.18.0",
     "bootstrap": "^5.2.3",
+    "cropperjs": "^1.5.13",
     "firebase": "^9.15.0",
     "firebase-admin": "^11.4.1",
     "nuxt": "^3.0.0",
-    "sass": "^1.57.1",
     "sass-loader": "^13.2.0"
+  },
+  "devDependencies": {
+    "sass": "^1.58.3"
   }
 }

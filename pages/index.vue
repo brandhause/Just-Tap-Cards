@@ -1,6 +1,6 @@
 <template>
   <div class="text-center">
-    <h1>Hello {{ currentUser ? currentUser.displayName : 'World' }}!</h1>
+    <h1 v-show="currentUser">Hello {{ currentUser ? currentUser.displayName : 'World' }}!</h1>
     <div v-show="currentUser">
       <nuxt-link to="/profile">View Profile</nuxt-link>
     </div>
