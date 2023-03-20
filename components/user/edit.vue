@@ -2,7 +2,7 @@
   <div>
     <form @submit.prevent="edit(user)">
 			<div class="crop-container mx-auto" style="max-height: 300px max-width: 300px">
-				<img class="mb-5" ref="imageCrop" src="https://picsum.photos/200">
+				<img class="mb-5" ref="imageCrop" :src="user.profileImage" crossorigin>
 			</div>
 			<button @click="cropImage">Crop</button>
       <div>
@@ -87,6 +87,7 @@ import Cropper from 'cropperjs';
       jobTitle: props.currentUser.jobTitle,
       company: props.currentUser.company,
       industryOrCategoryOfWork: props.currentUser.industryOrCategoryOfWork,
+      profileImage: props.currentUser.profileImage
     };
 
     const image = imageCrop.value;
@@ -101,6 +102,7 @@ import Cropper from 'cropperjs';
 			cropBoxMovable: false,
 			guides: false,
 			center: true,
+      checkCrossOrigin: false,
 			ready: function () {
 			croppable = true;
 			},
