@@ -14,7 +14,7 @@
 </template>
 <script setup>
 import { onAuthStateChanged } from 'firebase/auth';
-import { doc, onSnapshot, updateDoc } from "firebase/firestore";
+import { doc, onSnapshot, setDoc } from "firebase/firestore";
 
   const currentUser = ref();
   const toggleEdit = ref(false);
@@ -47,12 +47,17 @@ import { doc, onSnapshot, updateDoc } from "firebase/firestore";
 
   async function edit(user) {
     const { firestore } = useFirebase();
-    const fullName = `${user.fname} ${user.lname}`;
-    await updateDoc(doc(firestore, 'users', currentUser.value.uid), {
-      displayName: fullName,
-      jobTitle: user.jobTitle,
-      company: user.company,
-      industryOrCategoryOfWork: user.categoryOfWork
-    }).catch((err) => errCode.value = err.message);
+    const newUser = JSON.parse(JSON.stringify(user));
+    
+    const params = {
+      displayName: `${newUser.fname} ${newUser.lname}`,
+      ...newUser
+    };
+    delete params.fname;
+    delete params.lname;
+
+    await setDoc(
+      doc(firestore, 'users', currentUser.value.uid), params, { merge: true })
+      .catch((err) => errCode.value = err.message);
   }
 </script>

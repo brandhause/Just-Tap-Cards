@@ -2,7 +2,7 @@
   <div>
     <form @submit.prevent="edit(user)">
 			<div class="crop-container mx-auto" style="max-height: 300px max-width: 300px">
-				<img class="mb-5" ref="cropper" src="https://picsum.photos/200">
+				<img class="mb-5" ref="imageCrop" src="https://picsum.photos/200">
 			</div>
 			<button @click="cropImage">Crop</button>
       <div>
@@ -23,7 +23,7 @@
       </div>
       <div>
         <label for="category-work">Industry or Category of work:</label>
-        <input type="text" id="category-work" name="category-work" class="form-control mb-3" v-model="user.categoryOfWork" />
+        <input type="text" id="category-work" name="category-work" class="form-control mb-3" v-model="user.industryOrCategoryOfWork" />
       </div>
       <button class="save-btn" type="submit" @click="hideSave">Save</button>
     </form>
@@ -38,7 +38,8 @@ import Cropper from 'cropperjs';
   });
 
   const user = ref({});
-  let cropper = ref();
+  let imageCrop = ref();
+  let cropper = '';
 
 	function getRoundedCanvas(sourceCanvas) {
       var canvas = document.createElement('canvas');
@@ -85,11 +86,10 @@ import Cropper from 'cropperjs';
       lname: fullName.value[1],
       jobTitle: props.currentUser.jobTitle,
       company: props.currentUser.company,
-      categoryOfWork: props.currentUser.industryOrCategoryOfWork,
-      getImageUrl: props.currentUser.profileImage
+      industryOrCategoryOfWork: props.currentUser.industryOrCategoryOfWork,
     };
 
-    const image = cropper.value
+    const image = imageCrop.value;
 		let croppable = false;
 		cropper = new Cropper(image, {
 			dragMode: 'move',
