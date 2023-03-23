@@ -87,13 +87,13 @@ ul {
   gap: 15px;
 
   .social-media-item {
-    padding: 15px;
     background-color: #e7e7e7;
     border-radius: 15px;
 
-    svg {
-      width: 25px;
-      height: auto;
+    div {
+      width: 59px;
+      height: 59px;
+      padding: 1rem;
     }
   }
 }
