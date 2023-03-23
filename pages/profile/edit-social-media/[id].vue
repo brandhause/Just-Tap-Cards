@@ -91,6 +91,7 @@ import { doc, onSnapshot, updateDoc, arrayUnion, arrayRemove } from "firebase/fi
       id: +route.params.id,
       socialId: +social.id,
       socialName: social.name,
+      socialIcon: social.icon,
       url: filteredSocial.value.url
     });
 
@@ -98,6 +99,7 @@ import { doc, onSnapshot, updateDoc, arrayUnion, arrayRemove } from "firebase/fi
       id: +route.params.id,
       socialId: +social.id,
       socialName: social.name,
+      socialIcon: social.icon,
       url: socialUrl.value
     });
 
@@ -107,6 +109,7 @@ import { doc, onSnapshot, updateDoc, arrayUnion, arrayRemove } from "firebase/fi
         id: +route.params.id,
         socialId: +social.id,
         socialName: social.name,
+        socialIcon: social.icon,
         url: socialUrl.value
       }),
     }).then(() => {
@@ -121,6 +124,7 @@ import { doc, onSnapshot, updateDoc, arrayUnion, arrayRemove } from "firebase/fi
           id: +route.params.id,
           socialId: +social.id,
           socialName: social.name,
+          socialIcon: social.icon,
           url: filteredSocial.value.url
         })
       })
