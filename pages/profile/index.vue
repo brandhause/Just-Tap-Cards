@@ -31,7 +31,7 @@ s<template>
             <UserBio :currentUser="currentUser" />
           </div>
           <div class="social-media">
-            <UserSocialMedia />
+            <UserSocialMedia :currentUser="currentUser" />
           </div>
           <div class="video">
             <UserVideo :currentUser="currentUser" />

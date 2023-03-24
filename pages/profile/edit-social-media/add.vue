@@ -120,6 +120,7 @@ import { doc, onSnapshot, updateDoc, arrayUnion } from "firebase/firestore";
         id: Math.floor(Math.random() * Math.floor(Math.random() * Date.now())), // generate random id
         socialId: selectedSocial.value.id,
         socialName: selectedSocial.value.name,
+        socialIcon: selectedSocial.value.icon,
         url: socialUrl.value 
       }),
     })
