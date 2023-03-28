@@ -28,5 +28,9 @@
   const props = defineProps({
     currentUser: Object,
   });
+
+  onMounted(async () => {
+    console.log(props.currentUser);
+  })
   
 </script>

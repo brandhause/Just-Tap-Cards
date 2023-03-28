@@ -5,6 +5,7 @@
 				<img class="mb-5" ref="imageCrop" :src="user.profileImage" crossorigin>
 			</div>
 			<button @click="cropImage">Crop</button>
+      <button @click="enableCropper">Enable</button>
       <div>
         <label for="first-name">First name:</label>
         <input type="text" id="first-name" name="first-name" class="form-control mb-3" v-model="user.fname" />
@@ -40,6 +41,7 @@ import Cropper from 'cropperjs';
   const user = ref({});
   let imageCrop = ref();
   let cropper = '';
+  let croppable = false;
 
 	function getRoundedCanvas(sourceCanvas) {
       var canvas = document.createElement('canvas');
@@ -59,11 +61,51 @@ import Cropper from 'cropperjs';
   }
 
   function cropImage() {
+    if (!croppable) {
+      return;
+    }
 		const canvas = cropper.getCroppedCanvas();
 		const roundedCanvas = getRoundedCanvas(canvas);
 
       	const dataUrl = roundedCanvas.toDataURL('image/jpeg')
       	console.log(dataUrl)
+	}
+
+  function enableCropper() {
+    const image = imageCrop.value;
+    if(image) {
+      cropper = new Cropper(image, {
+        dragMode: 'move',
+        dragCrop: false,
+        zoomable: true,
+        minContainerWidth: 300,
+        minContainerHeight: 300,
+        minCropBoxWidth: 500,
+        minCropBoxHeight: 500,
+        cropBoxMovable: false,
+        guides: false,
+        center: true,
+        checkCrossOrigin: false,
+        viewMode: 3,
+        autoCropArea: 1,
+        restore: false,
+        modal: false,
+        highlight: false,
+        cropBoxResizable: false,
+        toggleDragModeOnDblclick: false,
+        ready: function () {
+          croppable = true;
+        },
+        crop(event) {
+          console.log(event.detail.x)
+          console.log(event.detail.y)
+          console.log(event.detail.width)
+          console.log(event.detail.height)
+        }
+      })
+    }else {
+      console.log('please upload a file');
+    }
 	}
 
   const fullName = computed(() => {
@@ -89,30 +131,6 @@ import Cropper from 'cropperjs';
       industryOrCategoryOfWork: props.currentUser.industryOrCategoryOfWork,
       profileImage: props.currentUser.profileImage
     };
-
-    const image = imageCrop.value;
-		let croppable = false;
-		cropper = new Cropper(image, {
-			dragMode: 'move',
-			zoomable: true,
-			minContainerWidth: 300,
-			minContainerHeight: 300,
-			minCropBoxWidth: 300,
-			minCropBoxHeight: 300,
-			cropBoxMovable: false,
-			guides: false,
-			center: true,
-      checkCrossOrigin: false,
-			ready: function () {
-			croppable = true;
-			},
-			crop(event) {
-				console.log(event.detail.x)
-				console.log(event.detail.y)
-				console.log(event.detail.width)
-				console.log(event.detail.height)
-			}
-		})
   });
   
 </script>
