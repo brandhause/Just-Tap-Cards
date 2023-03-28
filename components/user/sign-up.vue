@@ -55,7 +55,7 @@ dd<template>
 </template>
 <script setup>
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, arrayUnion } from "firebase/firestore";
 import { uploadBytesResumable, getDownloadURL, ref as storageRef } from "firebase/storage";
 
   const user = ref({
@@ -149,7 +149,18 @@ import { uploadBytesResumable, getDownloadURL, ref as storageRef } from "firebas
               }).catch((error) => {
                 console.log(error.message);
               });
-
+            // Set data to contact info collection
+              await setDoc(doc(firestore, 'contact_info', credentials.user.uid), {
+                address: arrayUnion({}),
+                email: arrayUnion({
+                  id: 1,
+                  email: credentials.user.email
+                }),
+                phone: arrayUnion({}),
+                website: arrayUnion({}),
+              }).catch((error) => {
+                console.log(error.message);
+              });
           });
         }
       );
