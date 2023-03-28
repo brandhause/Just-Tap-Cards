@@ -33,11 +33,14 @@ s<template>
           <div class="social-media">
             <UserSocialMedia :currentUser="currentUser" />
           </div>
+          <div class="links">
+            <UserLinks :currentUser="currentUser" />
+          </div>
           <div class="video">
             <UserVideo :currentUser="currentUser" />
           </div>
-          <div class="links">
-            <UserLinks :currentUser="currentUser" />
+          <div class="contact">
+            <UserContact :currentUser="currentUser" />
           </div>
           <div>
             <button @click="logout">Logout</button>
