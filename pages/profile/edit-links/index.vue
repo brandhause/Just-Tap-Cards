@@ -42,9 +42,9 @@
                 >
                   <template #item="{ element }">
                     <li class="list-group-item d-flex">
-                      <!-- <div>
-                        <img :src="matchSocial('icon', element)" :alt="matchSocial('icon', element)">
-                      </div> -->
+                      <div>
+                        <img :src="element.linkThumbnail" alt="">
+                      </div>
                       <div class="d-flex flex-column">
                         <!-- <strong>{{ matchSocial('name', element) }}</strong> -->
                         <a href="{{ element.linkURL }}"><small>{{ element.linktext }}</small></a>
@@ -123,7 +123,7 @@ import { doc, onSnapshot, updateDoc, arrayRemove, arrayUnion } from "firebase/fi
     console.log(items);
   })
   
-  // function matchSocial(id, social) {
+  // function matchLinks(id, link) {
   //   const socialNetwork = socialNetworks.value.find((s) => {
   //     return s.id === social.socialId;
   //   });
@@ -135,12 +135,12 @@ import { doc, onSnapshot, updateDoc, arrayRemove, arrayUnion } from "firebase/fi
   //   }
   // }
 
-  async function deleteLink(social) {
+  async function deleteLink(link) {
     const { firestore } = useFirebase();
-    const socialRef = doc(firestore, 'users', currentUser.value.uid);
+    const linkRef = doc(firestore, 'users', currentUser.value.uid);
 
-    await updateDoc(socialRef, {
-      socialNetwork: arrayRemove(social)
+    await updateDoc(linkRef, {
+      profileLinks: arrayRemove(link)
     })
   }
 

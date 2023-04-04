@@ -2,7 +2,7 @@
   <div class="container">
     <div class="row" v-if="currentUser">
       <div class="col-md-12">
-        <nuxt-link class="arrow-back" to="/profile/edit-social-media">
+        <nuxt-link class="arrow-back" to="/profile/edit-links">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
             <path d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.2 288 416 288c17.7 0 32-14.3 32-32s-14.3-32-32-32l-306.7 0L214.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z" />
           </svg>
@@ -105,28 +105,26 @@ import { doc, onSnapshot, updateDoc, arrayUnion, arrayRemove } from "firebase/fi
 
     // add new object to array with the same id
     await updateDoc(socialRef, {
-      socialNetwork: arrayUnion({
-        id: +route.params.id,
-        socialId: +social.id,
-        socialName: social.name,
-        socialIcon: social.icon,
-        url: socialUrl.value
+      profileLinks: arrayUnion({
+        id: Math.floor(Math.random() * Math.floor(Math.random() * Date.now())), // generate random id
+        linkThumbnail: linkThumbnail.value,
+        linktext: textLink.value,
+        linkURL: linkURL.value 
       }),
     }).then(() => {
-      return navigateTo('/profile/edit-social-media');
+      return navigateTo('/profile/edit-links');
     })
     .catch((err) => console.log(err.message));
 
     // remove existing array object
     if (existingSocial !== newSocial) {
       await updateDoc(socialRef, {
-        socialNetwork: arrayRemove({
-          id: +route.params.id,
-          socialId: +social.id,
-          socialName: social.name,
-          socialIcon: social.icon,
-          url: filteredSocial.value.url
-        })
+        profileLinks: arrayUnion({
+          id: Math.floor(Math.random() * Math.floor(Math.random() * Date.now())), // generate random id
+          linkThumbnail: linkThumbnail.value,
+          linktext: textLink.value,
+          linkURL: linkURL.value 
+        }),
       })
     }
   }

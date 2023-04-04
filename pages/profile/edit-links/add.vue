@@ -6,6 +6,11 @@
         <input type="text" v-model="textLink"/>
         <small>Paste URL here</small>
         <input type="text" v-model="linkURL" />
+        <img :src="croppedImage" alt="">
+        <label for="file-upload" class="custom-file-upload">
+            Custom Upload
+        </label>
+        <input id="file-upload" @change="addImage" type="file"/>
         <button
           class="next-btn border-0 px-5 py-2 rounded"
           :class="{ 'disabled': !linkURL }"
@@ -15,6 +20,14 @@
         </button>
       </div>
     </div>
+      <transition name="modal">
+        <div v-if="isOpen" class="modal-wrapper">
+          <div class="modal-overlay" @click="closeModal"></div>
+          <div class="modal-content">
+            <ModalsLinks @imageCropped="imageCropped" :close="closeModal" :imageUploadFile="imageUploadFile" ></ModalsLinks>
+          </div>
+        </div>
+      </transition>
   </div>
 </template>
 <script setup>
@@ -26,6 +39,12 @@ import { doc, onSnapshot, updateDoc, arrayUnion } from "firebase/firestore";
   const linkThumbnail = ref('');
   const currentUser = ref();
   const selected = ref();
+  const imageUploadFile = ref([]);
+  const isOpen = ref(false);
+  const imageCrop = ref();
+  const croppedImage = ref();
+  let cropper = '';
+  let croppable = false;
 
   onMounted(async () => {
     const { auth, firestore } = useFirebase();
@@ -57,12 +76,35 @@ import { doc, onSnapshot, updateDoc, arrayUnion } from "firebase/firestore";
     });
   })
 
+  function addImage(e) {
+
+    imageUploadFile.value = e.target.files[0];
+
+		const reader = new FileReader();
+
+		reader.onload = () => {
+			imageUploadFile.value = reader.result
+      isOpen.value = true;
+		};
+
+    reader.readAsDataURL(imageUploadFile.value);
+  }
+
+  function imageCropped(image) {
+    croppedImage.value = image;
+    isOpen.value = false;
+  }
+
+  const closeModal = () => {
+    isOpen.value = false;
+  };
+
   async function addLink() {
     const { firestore } = useFirebase();
     await updateDoc(doc(firestore, 'users', currentUser.value.uid), {
       profileLinks: arrayUnion({
         id: Math.floor(Math.random() * Math.floor(Math.random() * Date.now())), // generate random id
-        linkThumbnail: linkThumbnail.value,
+        linkThumbnail: croppedImage.value,
         linktext: textLink.value,
         linkURL: linkURL.value 
       }),
@@ -89,5 +131,55 @@ import { doc, onSnapshot, updateDoc, arrayUnion } from "firebase/firestore";
   font-weight: 700;
   color: #ffffff;
   background: #ff643a;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+.custom-file-upload {
+    border: 1px solid #ccc;
+    display: inline-block;
+    padding: 6px 12px;
+    cursor: pointer;
+}
+.modal-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
+  max-width: 600px;
+}
+
+.modal-enter-active,
+.modal-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
 }
 </style>
