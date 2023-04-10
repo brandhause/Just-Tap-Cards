@@ -23,6 +23,7 @@
         >
           Done
         </button>
+        {{social}}
       </div>
     </div>
   </div>

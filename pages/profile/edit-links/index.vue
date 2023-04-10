@@ -49,7 +49,7 @@
                         <!-- <strong>{{ matchSocial('name', element) }}</strong> -->
                         <a href="{{ element.linkURL }}"><small>{{ element.linktext }}</small></a>
                         <div class="d-flex">
-                          <nuxt-link class="px-3" :to="`/profile/edit-social-media/${element.id}`">Edit</nuxt-link>
+                          <nuxt-link class="px-3" :to="`/profile/edit-links/${element.id}`">Edit</nuxt-link>
                           <button class="bg-transparent border-0 px-3" @click="deleteLink(element)">Delete</button>
                         </div>
                       </div>
@@ -122,18 +122,6 @@ import { doc, onSnapshot, updateDoc, arrayRemove, arrayUnion } from "firebase/fi
 
     console.log(items);
   })
-  
-  // function matchLinks(id, link) {
-  //   const socialNetwork = socialNetworks.value.find((s) => {
-  //     return s.id === social.socialId;
-  //   });
-  //   if (socialNetwork && id === 'icon') {
-  //     return socialNetwork.icon;
-  //   }
-  //   if (socialNetwork && id === 'name') {
-  //     return socialNetwork.name;
-  //   }
-  // }
 
   async function deleteLink(link) {
     const { firestore } = useFirebase();

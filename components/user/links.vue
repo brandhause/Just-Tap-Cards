@@ -10,12 +10,12 @@
     </div>
     <div class="row">
         <div class="col-md-12">
-            <ul class="link-items p-0 m-0 d-flex">
-                <li class="link-item" v-for="link in currentUser.profileLinks" :key="`link-${link.id}`">
+            <ul class="link-items p-0 m-0 d-flex flex-column">
+                <li class="link-item mb-4" v-for="link in currentUser.profileLinks" :key="`link-${link.id}`">
                     <a :href="link.url" target="_blank">
                         <div>
-                            <!-- <img :src="link.socialIcon" :alt="social.socialName" /> -->
-                            <a href="{{ link.linkURL }}">
+                            <a class="d-flex align-items-center" :href="link.linkURL" target="_blank">
+                              <img :src="link.linkThumbnail" :alt="link.linkThumbnail" />
                               <p>{{ link.linktext }}</p>
                             </a>
                         </div>
@@ -31,3 +31,13 @@
     currentUser: [Array, Object],
   });
 </script>
+<style lang="scss">
+  .link-items {
+    img {
+      object-fit: cover;
+      height: auto;
+      width: 100px;
+      margin-right: 30px;
+    }
+  }
+</style>
