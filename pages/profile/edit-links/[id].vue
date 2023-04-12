@@ -125,15 +125,10 @@ import { doc, onSnapshot, updateDoc, arrayUnion, arrayRemove } from "firebase/fi
       linkURL: linkURL.value,
       linktext: textLink.value
     });
-
+    
     // add new object to array with the same id
     await updateDoc(linkRef, {
-      profileLinks: arrayUnion({
-        id: +route.params.id,
-        linkThumbnail: croppedImage.value,
-        linkURL: linkURL.value,
-        linktext: textLink.value
-      }),
+      profileLinks: arrayUnion(JSON.parse(newLink)),
     }).then(() => {
       return navigateTo('/profile/edit-links');
     })
@@ -142,12 +137,7 @@ import { doc, onSnapshot, updateDoc, arrayUnion, arrayRemove } from "firebase/fi
     // remove existing array object
     if (existingLink !== newLink) {
       await updateDoc(linkRef, {
-        profileLinks: arrayRemove({
-          id: +route.params.id,
-          linkThumbnail: filteredLink.value.linkThumbnail,
-          linkURL: filteredLink.value.linkURL,
-          linktext: filteredLink.value.linktext
-        })
+        profileLinks: arrayRemove(JSON.parse(existingLink))
       })
     }
   }

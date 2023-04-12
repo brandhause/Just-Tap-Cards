@@ -34,7 +34,7 @@
                     type: 'transition-group',
                     name: !drag ? 'flip-list' : null
                   }"
-                  v-model="items"
+                  v-model="newItems"
                   v-bind="dragOptions"
                   @start="drag = true"
                   @end="drag = false"
@@ -71,6 +71,7 @@ import { doc, onSnapshot, updateDoc, arrayRemove, arrayUnion } from "firebase/fi
   const toggleEdit = ref(false);
   const errCode = ref();
   const socialNetworks = ref([]);
+  const dragItems = ref([]);
   const items = ref([]);
 
   const dragOptions = computed(() => {
@@ -82,7 +83,7 @@ import { doc, onSnapshot, updateDoc, arrayRemove, arrayUnion } from "firebase/fi
     };
   });
 
-  watch(() => items.value, async (newItem, oldItem) => {
+  watch(() => dragItems.value, async (newItem, oldItem) => {
     const { firestore } = useFirebase();
     const docRef = doc(firestore, 'users', currentUser.value.uid);
     await updateDoc(docRef, {
@@ -119,8 +120,15 @@ import { doc, onSnapshot, updateDoc, arrayRemove, arrayUnion } from "firebase/fi
         // })
       }
     });
+  })
 
-    console.log(items);
+  const newItems = computed({
+    get() {
+      return items.value
+    },
+    set(newVal) {
+      dragItems.value = newVal;
+    }
   })
 
   async function deleteLink(link) {
