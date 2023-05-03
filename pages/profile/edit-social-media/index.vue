@@ -34,11 +34,11 @@
                     type: 'transition-group',
                     name: !drag ? 'flip-list' : null
                   }"
-                  v-model="items"
+                  v-model="itemList"
                   v-bind="dragOptions"
                   @start="drag = true"
                   @end="drag = false"
-                  item-key="order"
+                  item-key="id"
                 >
                   <template #item="{ element }">
                     <li class="list-group-item d-flex">
@@ -66,12 +66,15 @@
 import draggable from 'vuedraggable';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, onSnapshot, updateDoc, arrayRemove, arrayUnion } from "firebase/firestore";
-  const drag = ref(false);
+  
   const currentUser = ref();
-  const toggleEdit = ref(false);
   const errCode = ref();
+  const drag = ref(false);
+  const toggleEdit = ref(false);
   const socialNetworks = ref([]);
   const items = ref([]);
+
+  const nuxtApp = useNuxtApp();
 
   const dragOptions = computed(() => {
     return {
@@ -82,38 +85,48 @@ import { doc, onSnapshot, updateDoc, arrayRemove, arrayUnion } from "firebase/fi
     };
   });
 
-  watch(() => items.value, async (newItem, oldItem) => {
-    const { firestore } = useFirebase();
-    const socialRef = doc(firestore, 'users', currentUser.value.uid);
-    await updateDoc(socialRef, {
-      socialNetwork: newItem
-    })
+  const itemList = computed({
+    get() {
+      return currentUser.value.socialNetwork.sort((a, b) => a.order - b.order);
+    },
+    set(newVal) {
+      updateOrder(newVal);
+    }
   })
 
-  onMounted(async () => {
-    const { auth, firestore } = useFirebase();
+  async function updateOrder(newVal) {
+    const items = newVal;
+    items.forEach((item, index) => {
+      return item.order = index += 1
+    })
+    
+    const socialRef = doc(nuxtApp.$firestore, 'users', currentUser.value.uid);
+    await updateDoc(socialRef, {
+      socialNetwork: items
+    })
+  }
 
-    onAuthStateChanged(auth, (user) => {
+  onMounted(async () => {
+    onAuthStateChanged(nuxtApp.$auth, (user) => {
       if (!user) {
         return navigateTo({
           path: '/'
         });
       } else {
-        const docRef = doc(firestore, 'users', user.uid);
+        const docRef = doc(nuxtApp.$firestore, 'users', user.uid);
         onSnapshot(docRef,
           (snap) => {
             currentUser.value = {
             uid: user.uid,
             ...snap.data()
             }
-            items.value = currentUser.value.socialNetwork;
           },
           (error) => {
             //
           },
         );
         
-        const socialRef = doc(firestore, 'social_network', 'social_doc');
+        const socialRef = doc(nuxtApp.$firestore, 'social_network', 'social_doc');
         onSnapshot(socialRef, (snap) => {
           socialNetworks.value = snap.data().data;
         })
@@ -134,8 +147,7 @@ import { doc, onSnapshot, updateDoc, arrayRemove, arrayUnion } from "firebase/fi
   }
 
   async function deleteSocial(social) {
-    const { firestore } = useFirebase();
-    const socialRef = doc(firestore, 'users', currentUser.value.uid);
+    const socialRef = doc(nuxtApp.$firestore, 'users', currentUser.value.uid);
 
     await updateDoc(socialRef, {
       socialNetwork: arrayRemove(social)

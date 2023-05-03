@@ -13,12 +13,15 @@
         <input id="file-upload" @change="addImage" type="file"/>
         <button
           class="next-btn border-0 px-5 py-2 rounded"
-          :class="{ 'disabled': !linkURL }"
-          @click="editLink(filteredLink)"
+          :class="{
+            'disabled': filteredLink.linkUrl === linkURL &&
+            filteredLink.linkThumbnail === croppedImage &&
+            filteredLink.value === textLink
+          }"
+          @click="editLink"
         >
           Done
         </button>
-        {{filteredLink}}
       </div>
     </div>
       <transition name="modal">
@@ -35,6 +38,7 @@
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, onSnapshot, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
 
+  const nuxtApp = useNuxtApp();
   const route = useRoute();
   const id = ref();
   const currentUser = ref();
@@ -57,24 +61,23 @@ import { doc, onSnapshot, updateDoc, arrayUnion, arrayRemove } from "firebase/fi
   })
 
   onMounted(async () => {
-    const { auth, firestore } = useFirebase();
 
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(nuxtApp.$auth, (user) => {
       if (!user) {
         return navigateTo({
           path: '/'
         });
       } else {
-        const docRef = doc(firestore, 'users', user.uid);
+        const docRef = doc(nuxtApp.$firestore, 'users', user.uid);
           onSnapshot(docRef,
             (snap) => {
               currentUser.value = {
                 uid: user.uid,
                 ...snap.data()
               }
-              croppedImage.value = filteredLink.value.linkThumbnail;
-              linkURL.value = filteredLink.value.linkURL;
-              textLink.value = filteredLink.value.linktext;
+              croppedImage.value = croppedImage.value || filteredLink.value.linkThumbnail;
+              linkURL.value = linkURL.value || filteredLink.value.linkURL;
+              textLink.value = textLink.value || filteredLink.value.linktext;
             },
             (error) => {
               //
@@ -109,67 +112,30 @@ import { doc, onSnapshot, updateDoc, arrayUnion, arrayRemove } from "firebase/fi
   };
 
   async function editLink(link) {
-    const { firestore } = useFirebase();
-    const linkRef = doc(firestore, 'users', currentUser.value.uid);
-
-    const existingLink = JSON.stringify({
-      id: +route.params.id,
-      linkThumbnail: link.linkThumbnail,
-      linkURL: link.linkURL,
-      linktext: link.linktext
-    });
-
-    const newLink = JSON.stringify({
-      id: +route.params.id,
-      linkThumbnail: croppedImage.value,
-      linkURL: linkURL.value,
-      linktext: textLink.value
-    });
-
-    // add new object to array with the same id
+    const linkRef = doc(nuxtApp.$firestore, 'users', currentUser.value.uid);
+    
+    // add new object to array with the same id but new value
     await updateDoc(linkRef, {
       profileLinks: arrayUnion({
-        id: +route.params.id,
+        ...filteredLink.value,
         linkThumbnail: croppedImage.value,
         linkURL: linkURL.value,
-        linktext: textLink.value
+        linktext: textLink.value,
       }),
-    }).then(() => {
+    })
+    .then(() => {
       return navigateTo('/profile/edit-links');
     })
     .catch((err) => console.log(err.message));
 
     // remove existing array object
-    if (existingLink !== newLink) {
-      await updateDoc(linkRef, {
-        profileLinks: arrayRemove({
-          id: +route.params.id,
-          linkThumbnail: filteredLink.value.linkThumbnail,
-          linkURL: filteredLink.value.linkURL,
-          linktext: filteredLink.value.linktext
-        })
-      })
-    }
+    await updateDoc(linkRef, {
+      profileLinks: arrayRemove(filteredLink.value)
+    })
+    .catch((err) => console.log(err.message));
   }
 </script>
 <style lang="scss">
-.highlight {
-  font-weight: 700;
-  color: #ff643a;
-  background: #f5f5f5;
-}
-
-.disabled {
-  background: #d4d4d4 !important;
-  pointer-events: none;
-}
-
-.next-btn {
-  font-weight: 700;
-  color: #ffffff;
-  background: #ff643a;
-}
-
 input[type="file"] {
     display: none;
 }

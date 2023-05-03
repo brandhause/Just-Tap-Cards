@@ -15,7 +15,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { doc, onSnapshot } from "firebase/firestore";
 
   const currentUser = ref();
-
+  const nuxtApp = useNuxtApp();
   const route = useRoute();
 
   const getQuery = computed(() => {
@@ -24,11 +24,9 @@ import { doc, onSnapshot } from "firebase/firestore";
   });
 
   onMounted(async () => {
-    const { auth, firestore } = useFirebase();
-
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(nuxtApp.$auth, (user) => {
       if (user) {
-        const docRef = doc(firestore, 'users', user.uid);
+        const docRef = doc(nuxtApp.$firestore, 'users', user.uid);
         onSnapshot(docRef,
           (snap) => {
             currentUser.value = {

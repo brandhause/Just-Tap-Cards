@@ -13,7 +13,7 @@
         <input id="file-upload" @change="addImage" type="file"/>
         <button
           class="next-btn border-0 px-5 py-2 rounded"
-          :class="{ 'disabled': !linkURL }"
+          :class="{ 'disabled': !linkURL || !croppedImage || !textLink }"
           @click="addLink"
         >
           Done
@@ -34,6 +34,7 @@
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, onSnapshot, updateDoc, arrayUnion } from "firebase/firestore";
 
+  const nuxtApp = useNuxtApp();
   const linkURL = ref('');
   const textLink = ref('');
   const linkThumbnail = ref('');
@@ -47,15 +48,14 @@ import { doc, onSnapshot, updateDoc, arrayUnion } from "firebase/firestore";
   let croppable = false;
 
   onMounted(async () => {
-    const { auth, firestore } = useFirebase();
 
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(nuxtApp.$auth, (user) => {
       if (!user) {
         return navigateTo({
           path: '/'
         });
       } else {
-        const docRef = doc(firestore, 'users', user.uid);
+        const docRef = doc(nuxtApp.$firestore, 'users', user.uid);
         onSnapshot(docRef,
           (snap) => {
             currentUser.value = {
@@ -99,14 +99,24 @@ import { doc, onSnapshot, updateDoc, arrayUnion } from "firebase/firestore";
     isOpen.value = false;
   };
 
+  const maxOrderCount = computed({
+    get() {
+      if (!currentUser.value.profileLinks.length) return;
+      return currentUser.value.profileLinks.sort((a, b) => b.order - a.order)[0].order;
+    },
+    set(newVal) {
+      return newVal
+    }
+  })
+
   async function addLink() {
-    const { firestore } = useFirebase();
-    await updateDoc(doc(firestore, 'users', currentUser.value.uid), {
+    await updateDoc(doc(nuxtApp.$firestore, 'users', currentUser.value.uid), {
       profileLinks: arrayUnion({
         id: Math.floor(Math.random() * Math.floor(Math.random() * Date.now())), // generate random id
         linkThumbnail: croppedImage.value,
         linktext: textLink.value,
-        linkURL: linkURL.value 
+        linkURL: linkURL.value,
+        order: maxOrderCount.value ? maxOrderCount.value += 1 : 1
       }),
     })
     .then(() => {
@@ -116,23 +126,6 @@ import { doc, onSnapshot, updateDoc, arrayUnion } from "firebase/firestore";
   }
 </script>
 <style lang="scss">
-.highlight {
-  font-weight: 700;
-  color: #ff643a;
-  background: #f5f5f5;
-}
-
-.disabled {
-  background: #d4d4d4 !important;
-  pointer-events: none;
-}
-
-.next-btn {
-  font-weight: 700;
-  color: #ffffff;
-  background: #ff643a;
-}
-
 input[type="file"] {
     display: none;
 }

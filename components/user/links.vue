@@ -11,7 +11,7 @@
     <div class="row">
         <div class="col-md-12">
             <ul class="link-items p-0 m-0 d-flex flex-column">
-                <li class="link-item mb-4" v-for="link in currentUser.profileLinks" :key="`link-${link.id}`">
+                <li class="link-item mb-4" v-for="link in sortLinks" :key="`link-${link.id}`">
                     <a :href="link.url" target="_blank">
                         <div>
                             <a class="d-flex align-items-center" :href="link.linkURL" target="_blank">
@@ -30,6 +30,12 @@
   const props = defineProps({
     currentUser: [Array, Object],
   });
+
+  const sortLinks = computed(() => {
+    if (!props.currentUser || !props.currentUser.profileLinks) return [];
+    return props.currentUser.profileLinks.sort((a, b) => a.order - b.order);
+  });
+
 </script>
 <style lang="scss">
   .link-items {

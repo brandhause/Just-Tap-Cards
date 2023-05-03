@@ -49,7 +49,7 @@ import { doc, onSnapshot, updateDoc, arrayUnion } from "firebase/firestore"
   const phoneType = ref([])
   const addressType = ref([])
   const currentUser = ref([])
-  const { auth, firestore } = useFirebase()
+  const nuxtApp = useNuxtApp();
 
   const contact = ref({
     address: {
@@ -63,16 +63,16 @@ import { doc, onSnapshot, updateDoc, arrayUnion } from "firebase/firestore"
   })
 
   onMounted(() => {
-    const phoneRef = doc(firestore, 'phone', 'data')
-    const addressRef = doc(firestore, 'address_type', 'data')
+    const phoneRef = doc(nuxtApp.$firestore, 'phone', 'data')
+    const addressRef = doc(nuxtApp.$firestore, 'address_type', 'data')
 
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(nuxtApp.$auth, (user) => {
       if (!user) {
         return navigateTo({
           path: '/'
         });
       } else {
-        const docRef = doc(firestore, 'users', user.uid);
+        const docRef = doc(nuxtApp.$firestore, 'users', user.uid);
         onSnapshot(docRef,
           (snap) => {
             currentUser.value = {
@@ -107,7 +107,7 @@ import { doc, onSnapshot, updateDoc, arrayUnion } from "firebase/firestore"
   })
   
   async function submitForm(contact) {
-    const contactRef = doc(firestore, 'contact_info', currentUser.value.uid)
+    const contactRef = doc(nuxtApp.$firestore, 'contact_info', currentUser.value.uid)
     
     await updateDoc(contactRef, {
       address: arrayUnion(contact.address),

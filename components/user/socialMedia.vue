@@ -11,7 +11,7 @@
     <div class="row">
         <div class="col-md-12">
             <ul class="social-media-items p-0 m-0 d-flex">
-                <li class="social-media-item" v-for="social in currentUser.socialNetwork" :key="`social-${social.id}`">
+                <li class="social-media-item" v-for="social in sortSocial" :key="`social-${social.id}`">
                     <a :href="social.url" target="_blank">
                         <div>
                             <img :src="social.socialIcon" :alt="social.socialName" />
@@ -29,8 +29,9 @@
     currentUser: Object,
   });
 
-  onMounted(async () => {
-    console.log(props.currentUser);
-  })
+  const sortSocial = computed(() => {
+    if (!props.currentUser || !props.currentUser.socialNetwork) return [];
+    return props.currentUser.socialNetwork.sort((a, b) => a.order - b.order);
+  });
   
 </script>

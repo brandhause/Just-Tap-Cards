@@ -18,12 +18,11 @@
         <input type="text" v-model="socialUrl" />
         <button
           class="next-btn border-0 px-5 py-2 rounded"
-          :class="{ 'disabled': !socialUrl }"
-          @click="addSocialNetwork(social)"
+          :class="{ 'disabled': socialUrl === filteredSocial.url }"
+          @click="addSocialNetwork"
         >
           Done
         </button>
-        {{social}}
       </div>
     </div>
   </div>
@@ -32,9 +31,10 @@
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, onSnapshot, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
 
+  const nuxtApp = useNuxtApp();
   const route = useRoute();
   const id = ref();
-  const socialUrl = ref('');
+  const socialUrl = ref();
   const socialNetworks = ref([]);
   const currentUser = ref();
 
@@ -53,82 +53,50 @@ import { doc, onSnapshot, updateDoc, arrayUnion, arrayRemove } from "firebase/fi
   })
 
   onMounted(async () => {
-    const { auth, firestore } = useFirebase();
 
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(nuxtApp.$auth, (user) => {
       if (!user) {
         return navigateTo({
           path: '/'
         });
       } else {
-        const docRef = doc(firestore, 'users', user.uid);
+        const docRef = doc(nuxtApp.$firestore, 'users', user.uid);
           onSnapshot(docRef,
             (snap) => {
               currentUser.value = {
                 uid: user.uid,
                 ...snap.data()
               }
-              socialUrl.value = filteredSocial.value.url;
+              socialUrl.value = socialUrl.value || filteredSocial.value.url;
             },
             (error) => {
               //
             },
         );
         
-        const socialRef = doc(firestore, 'social_network', 'social_doc');
+        const socialRef = doc(nuxtApp.$firestore, 'social_network', 'social_doc');
         onSnapshot(socialRef, (snap) => {
           socialNetworks.value = snap.data().data;
         })
       }
     });
-
   })
 
-  async function addSocialNetwork(social) {
-    const { firestore } = useFirebase();
-    const socialRef = doc(firestore, 'users', currentUser.value.uid);
-
-    const existingSocial = JSON.stringify({
-      id: +route.params.id,
-      socialId: +social.id,
-      socialName: social.name,
-      socialIcon: social.icon,
-      url: filteredSocial.value.url
-    });
-
-    const newSocial = JSON.stringify({
-      id: +route.params.id,
-      socialId: +social.id,
-      socialName: social.name,
-      socialIcon: social.icon,
-      url: socialUrl.value
-    });
-
-    // add new object to array with the same id
+  async function addSocialNetwork() {
+    const socialRef = doc(nuxtApp.$firestore, 'users', currentUser.value.uid);
+    
+    // add new object to array with the same id but different urk value
     await updateDoc(socialRef, {
-      socialNetwork: arrayUnion({
-        id: +route.params.id,
-        socialId: +social.id,
-        socialName: social.name,
-        socialIcon: social.icon,
-        url: socialUrl.value
-      }),
+      socialNetwork: arrayUnion({ ...filteredSocial.value, url: socialUrl.value }),
     }).then(() => {
       return navigateTo('/profile/edit-social-media');
     })
     .catch((err) => console.log(err.message));
 
     // remove existing array object
-    if (existingSocial !== newSocial) {
-      await updateDoc(socialRef, {
-        socialNetwork: arrayRemove({
-          id: +route.params.id,
-          socialId: +social.id,
-          socialName: social.name,
-          socialIcon: social.icon,
-          url: filteredSocial.value.url
-        })
-      })
-    }
+    await updateDoc(socialRef, {
+      socialNetwork: arrayRemove(filteredSocial.value)
+    }).catch((err) => console.log(err.message));
+
   }
 </script>

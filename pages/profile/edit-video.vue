@@ -20,16 +20,17 @@ import { doc, onSnapshot, updateDoc } from "firebase/firestore";
   const toggleEdit = ref(false);
   const errCode = ref();
 
-  onMounted(async () => {
-    const { auth, firestore } = useFirebase();
+  const nuxtApp = useNuxtApp();
 
-    onAuthStateChanged(auth, (user) => {
+  onMounted(async () => {
+
+    onAuthStateChanged(nuxtApp.$auth, (user) => {
       if (!user) {
         return navigateTo({
           path: '/'
         });
       } else {
-        const docRef = doc(firestore, 'users', user.uid);
+        const docRef = doc(nuxtApp.$firestore, 'users', user.uid);
         onSnapshot(docRef,
           (snap) => {
             currentUser.value = {
@@ -46,14 +47,11 @@ import { doc, onSnapshot, updateDoc } from "firebase/firestore";
   })
 
   async function logout() {
-    const { auth } = useFirebase();
-    await auth.signOut();
+    await nuxtApp.$auth.signOut();
   }
 
   async function editVideo(user) {
-    console.log(user);
-    const { firestore } = useFirebase();
-    await updateDoc(doc(firestore, 'users', currentUser.value.uid), {
+    await updateDoc(doc(nuxtApp.$firestore, 'users', currentUser.value.uid), {
       video: user.video,
       videoDescription: user.videoDescription,
     }).catch((err) => errCode.value = err.message);
