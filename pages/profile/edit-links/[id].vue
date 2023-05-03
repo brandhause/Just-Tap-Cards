@@ -13,12 +13,15 @@
         <input id="file-upload" @change="addImage" type="file"/>
         <button
           class="next-btn border-0 px-5 py-2 rounded"
-          :class="{ 'disabled': !linkURL }"
-          @click="editLink(filteredLink)"
+          :class="{
+            'disabled': filteredLink.linkUrl === linkURL &&
+            filteredLink.linkThumbnail === croppedImage &&
+            filteredLink.value === textLink
+          }"
+          @click="editLink"
         >
           Done
         </button>
-        {{filteredLink}}
       </div>
     </div>
       <transition name="modal">
@@ -72,9 +75,9 @@ import { doc, onSnapshot, updateDoc, arrayUnion, arrayRemove } from "firebase/fi
                 uid: user.uid,
                 ...snap.data()
               }
-              croppedImage.value = filteredLink.value.linkThumbnail;
-              linkURL.value = filteredLink.value.linkURL;
-              textLink.value = filteredLink.value.linktext;
+              croppedImage.value = croppedImage.value || filteredLink.value.linkThumbnail;
+              linkURL.value = linkURL.value || filteredLink.value.linkURL;
+              textLink.value = textLink.value || filteredLink.value.linktext;
             },
             (error) => {
               //
@@ -110,35 +113,26 @@ import { doc, onSnapshot, updateDoc, arrayUnion, arrayRemove } from "firebase/fi
 
   async function editLink(link) {
     const linkRef = doc(nuxtApp.$firestore, 'users', currentUser.value.uid);
-
-    const existingLink = JSON.stringify({
-      id: +route.params.id,
-      linkThumbnail: link.linkThumbnail,
-      linkURL: link.linkURL,
-      linktext: link.linktext
-    });
-
-    const newLink = JSON.stringify({
-      id: +route.params.id,
-      linkThumbnail: croppedImage.value,
-      linkURL: linkURL.value,
-      linktext: textLink.value
-    });
     
-    // add new object to array with the same id
+    // add new object to array with the same id but new value
     await updateDoc(linkRef, {
-      profileLinks: arrayUnion(JSON.parse(newLink)),
-    }).then(() => {
+      profileLinks: arrayUnion({
+        ...filteredLink.value,
+        linkThumbnail: croppedImage.value,
+        linkURL: linkURL.value,
+        linktext: textLink.value,
+      }),
+    })
+    .then(() => {
       return navigateTo('/profile/edit-links');
     })
     .catch((err) => console.log(err.message));
 
     // remove existing array object
-    if (existingLink !== newLink) {
-      await updateDoc(linkRef, {
-        profileLinks: arrayRemove(JSON.parse(existingLink))
-      })
-    }
+    await updateDoc(linkRef, {
+      profileLinks: arrayRemove(filteredLink.value)
+    })
+    .catch((err) => console.log(err.message));
   }
 </script>
 <style lang="scss">

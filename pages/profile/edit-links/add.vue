@@ -13,7 +13,7 @@
         <input id="file-upload" @change="addImage" type="file"/>
         <button
           class="next-btn border-0 px-5 py-2 rounded"
-          :class="{ 'disabled': !linkURL }"
+          :class="{ 'disabled': !linkURL || !croppedImage || !textLink }"
           @click="addLink"
         >
           Done
@@ -99,13 +99,24 @@ import { doc, onSnapshot, updateDoc, arrayUnion } from "firebase/firestore";
     isOpen.value = false;
   };
 
+  const maxOrderCount = computed({
+    get() {
+      if (!currentUser.value.profileLinks.length) return;
+      return currentUser.value.profileLinks.sort((a, b) => b.order - a.order)[0].order;
+    },
+    set(newVal) {
+      return newVal
+    }
+  })
+
   async function addLink() {
     await updateDoc(doc(nuxtApp.$firestore, 'users', currentUser.value.uid), {
       profileLinks: arrayUnion({
         id: Math.floor(Math.random() * Math.floor(Math.random() * Date.now())), // generate random id
         linkThumbnail: croppedImage.value,
         linktext: textLink.value,
-        linkURL: linkURL.value 
+        linkURL: linkURL.value,
+        order: maxOrderCount.value ? maxOrderCount.value += 1 : 1
       }),
     })
     .then(() => {

@@ -34,11 +34,11 @@
                     type: 'transition-group',
                     name: !drag ? 'flip-list' : null
                   }"
-                  v-model="newItems"
+                  v-model="itemList"
                   v-bind="dragOptions"
                   @start="drag = true"
                   @end="drag = false"
-                  item-key="order"
+                  item-key="id"
                 >
                   <template #item="{ element }">
                     <li class="list-group-item d-flex">
@@ -73,8 +73,6 @@ import { doc, onSnapshot, updateDoc, arrayRemove, arrayUnion } from "firebase/fi
   const toggleEdit = ref(false);
   const errCode = ref();
   const socialNetworks = ref([]);
-  const dragItems = ref([]);
-  const items = ref([]);
 
   const dragOptions = computed(() => {
     return {
@@ -84,13 +82,6 @@ import { doc, onSnapshot, updateDoc, arrayRemove, arrayUnion } from "firebase/fi
       ghostClass: "ghost"
     };
   });
-
-  watch(() => dragItems.value, async (newItem, oldItem) => {
-    const docRef = doc(nuxtApp.$firestore, 'users', currentUser.value.uid);
-    await updateDoc(docRef, {
-      profileLinks: newItem
-    })
-  })
 
   onMounted(async () => {
 
@@ -107,29 +98,35 @@ import { doc, onSnapshot, updateDoc, arrayRemove, arrayUnion } from "firebase/fi
             uid: user.uid,
             ...snap.data()
             }
-            items.value = currentUser.value.profileLinks;
           },
           (error) => {
             //
           },
         );
-        
-        // const socialRef = doc(firestore, 'social_network', 'social_doc');
-        // onSnapshot(socialRef, (snap) => {
-        //   socialNetworks.value = snap.data().data;
-        // })
       }
     });
   })
 
-  const newItems = computed({
+  const itemList = computed({
     get() {
-      return items.value
+      return currentUser.value.profileLinks.sort((a, b) => a.order - b.order);
     },
     set(newVal) {
-      dragItems.value = newVal;
+      updateOrder(newVal);
     }
   })
+
+  async function updateOrder(newVal) {
+    const items = newVal;
+    items.forEach((item, index) => {
+      return item.order = index += 1
+    })
+    
+    const docRef = doc(nuxtApp.$firestore, 'users', currentUser.value.uid);
+    await updateDoc(docRef, {
+      profileLinks: items
+    })
+  }
 
   async function deleteLink(link) {
     const linkRef = doc(nuxtApp.$firestore, 'users', currentUser.value.uid);

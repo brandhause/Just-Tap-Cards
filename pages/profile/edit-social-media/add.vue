@@ -130,7 +130,7 @@ import { doc, onSnapshot, updateDoc, arrayUnion } from "firebase/firestore";
         socialName: selectedSocial.value.name,
         socialIcon: selectedSocial.value.icon,
         url: socialUrl.value,
-        order: maxOrderCount.value += 1
+        order: maxOrderCount.value ? maxOrderCount.value += 1 : 1
       }),
     })
     .then(() => {

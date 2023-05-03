@@ -54,6 +54,7 @@ export default function() {
                   email: credentials.user.email,
                   emailVerified: credentials.user.emailVerified,
                   profileImage: downloadURL,
+                  profileLinks: arrayUnion({}),
                   socialNetwork: arrayUnion({}),
                 }).catch((error) => {
                   console.log(error.message);
