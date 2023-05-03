@@ -66,6 +66,8 @@
 import draggable from 'vuedraggable';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, onSnapshot, updateDoc, arrayRemove, arrayUnion } from "firebase/firestore";
+
+  const nuxtApp = useNuxtApp();
   const drag = ref(false);
   const currentUser = ref();
   const toggleEdit = ref(false);
@@ -84,23 +86,21 @@ import { doc, onSnapshot, updateDoc, arrayRemove, arrayUnion } from "firebase/fi
   });
 
   watch(() => dragItems.value, async (newItem, oldItem) => {
-    const { firestore } = useFirebase();
-    const docRef = doc(firestore, 'users', currentUser.value.uid);
+    const docRef = doc(nuxtApp.$firestore, 'users', currentUser.value.uid);
     await updateDoc(docRef, {
       profileLinks: newItem
     })
   })
 
   onMounted(async () => {
-    const { auth, firestore } = useFirebase();
 
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(nuxtApp.$auth, (user) => {
       if (!user) {
         return navigateTo({
           path: '/'
         });
       } else {
-        const docRef = doc(firestore, 'users', user.uid);
+        const docRef = doc(nuxtApp.$firestore, 'users', user.uid);
         onSnapshot(docRef,
           (snap) => {
             currentUser.value = {
@@ -132,8 +132,7 @@ import { doc, onSnapshot, updateDoc, arrayRemove, arrayUnion } from "firebase/fi
   })
 
   async function deleteLink(link) {
-    const { firestore } = useFirebase();
-    const linkRef = doc(firestore, 'users', currentUser.value.uid);
+    const linkRef = doc(nuxtApp.$firestore, 'users', currentUser.value.uid);
 
     await updateDoc(linkRef, {
       profileLinks: arrayRemove(link)

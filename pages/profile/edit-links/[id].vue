@@ -35,6 +35,7 @@
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, onSnapshot, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
 
+  const nuxtApp = useNuxtApp();
   const route = useRoute();
   const id = ref();
   const currentUser = ref();
@@ -57,15 +58,14 @@ import { doc, onSnapshot, updateDoc, arrayUnion, arrayRemove } from "firebase/fi
   })
 
   onMounted(async () => {
-    const { auth, firestore } = useFirebase();
 
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(nuxtApp.$auth, (user) => {
       if (!user) {
         return navigateTo({
           path: '/'
         });
       } else {
-        const docRef = doc(firestore, 'users', user.uid);
+        const docRef = doc(nuxtApp.$firestore, 'users', user.uid);
           onSnapshot(docRef,
             (snap) => {
               currentUser.value = {
@@ -109,8 +109,7 @@ import { doc, onSnapshot, updateDoc, arrayUnion, arrayRemove } from "firebase/fi
   };
 
   async function editLink(link) {
-    const { firestore } = useFirebase();
-    const linkRef = doc(firestore, 'users', currentUser.value.uid);
+    const linkRef = doc(nuxtApp.$firestore, 'users', currentUser.value.uid);
 
     const existingLink = JSON.stringify({
       id: +route.params.id,
@@ -143,23 +142,6 @@ import { doc, onSnapshot, updateDoc, arrayUnion, arrayRemove } from "firebase/fi
   }
 </script>
 <style lang="scss">
-.highlight {
-  font-weight: 700;
-  color: #ff643a;
-  background: #f5f5f5;
-}
-
-.disabled {
-  background: #d4d4d4 !important;
-  pointer-events: none;
-}
-
-.next-btn {
-  font-weight: 700;
-  color: #ffffff;
-  background: #ff643a;
-}
-
 input[type="file"] {
     display: none;
 }

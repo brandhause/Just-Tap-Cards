@@ -28,16 +28,19 @@ import { ref, onMounted } from "vue";
 
   const playerContainerDiv = ref();
 
-    onMounted(() => {
-        const playerContainer = playerContainerDiv.value;
-        const videoUrl = props.currentUser.video;
-        const videoId = videoUrl.substring(videoUrl.lastIndexOf('/') + 1)
-        const player = new Player(playerContainer, {
-        id: videoId,
-        autoplay: false,
-        controls: true,
-        loop: false,
-        muted: false,
-        })
-    });
+  onMounted(() => {
+    const playerContainer = playerContainerDiv.value;
+    const videoUrl = props.currentUser.video;
+    
+    if (videoUrl) {
+      const videoId = videoUrl.substring(videoUrl.lastIndexOf('/') + 1)
+      const player = new Player(playerContainer, {
+      id: videoId,
+      autoplay: false,
+      controls: true,
+      loop: false,
+      muted: false,
+      })
+    }
+  });
 </script>

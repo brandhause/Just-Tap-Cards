@@ -20,16 +20,17 @@ import { doc, onSnapshot, setDoc } from "firebase/firestore";
   const toggleEdit = ref(false);
   const errCode = ref();
 
-  onMounted(async () => {
-    const { auth, firestore } = useFirebase();
+  const nuxtApp = useNuxtApp();
 
-    onAuthStateChanged(auth, (user) => {
+  onMounted(async () => {
+
+    onAuthStateChanged(nuxtApp.$auth, (user) => {
       if (!user) {
         return navigateTo({
           path: '/'
         });
       } else {
-        const docRef = doc(firestore, 'users', user.uid);
+        const docRef = doc(nuxtApp.$firestore, 'users', user.uid);
         onSnapshot(docRef,
           (snap) => {
             currentUser.value = {
@@ -46,7 +47,6 @@ import { doc, onSnapshot, setDoc } from "firebase/firestore";
   })
 
   async function edit(user) {
-    const { firestore } = useFirebase();
     const newUser = JSON.parse(JSON.stringify(user));
     
     const params = {
@@ -57,7 +57,7 @@ import { doc, onSnapshot, setDoc } from "firebase/firestore";
     delete params.lname;
 
     await setDoc(
-      doc(firestore, 'users', currentUser.value.uid), params, { merge: true })
+      doc(nuxtApp.$firestore, 'users', currentUser.value.uid), params, { merge: true })
       .catch((err) => errCode.value = err.message);
   }
 </script>

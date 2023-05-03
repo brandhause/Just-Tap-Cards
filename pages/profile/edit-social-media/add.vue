@@ -59,6 +59,7 @@
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, onSnapshot, updateDoc, arrayUnion } from "firebase/firestore";
 
+  const nuxtApp = useNuxtApp();
   const socialUrl = ref('');
   const searchTxt = ref('');
   const currentUser = ref();
@@ -77,15 +78,14 @@ import { doc, onSnapshot, updateDoc, arrayUnion } from "firebase/firestore";
   })
 
   onMounted(async () => {
-    const { auth, firestore } = useFirebase();
 
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(nuxtApp.$auth, (user) => {
       if (!user) {
         return navigateTo({
           path: '/'
         });
       } else {
-        const docRef = doc(firestore, 'users', user.uid);
+        const docRef = doc(nuxtApp.$firestore, 'users', user.uid);
         onSnapshot(docRef,
           (snap) => {
             currentUser.value = {
@@ -98,7 +98,7 @@ import { doc, onSnapshot, updateDoc, arrayUnion } from "firebase/firestore";
           },
         );
 
-        const socialRef = doc(firestore, 'social_network', 'social_doc');
+        const socialRef = doc(nuxtApp.$firestore, 'social_network', 'social_doc');
         onSnapshot(socialRef, (snap) => {
           socialNetwork.value = snap.data().data;
         })
@@ -113,15 +113,24 @@ import { doc, onSnapshot, updateDoc, arrayUnion } from "firebase/firestore";
     });
   }
 
+  const maxOrderCount = computed({
+    get() {
+      return currentUser.value.socialNetwork.sort((a, b) => b.order - a.order)[0].order;
+    },
+    set(newVal) {
+      return newVal
+    }
+  })
+
   async function addSocialNetwork() {
-    const { firestore } = useFirebase();
-    await updateDoc(doc(firestore, 'users', currentUser.value.uid), {
+    await updateDoc(doc(nuxtApp.$firestore, 'users', currentUser.value.uid), {
       socialNetwork: arrayUnion({
         id: Math.floor(Math.random() * Math.floor(Math.random() * Date.now())), // generate random id
         socialId: selectedSocial.value.id,
         socialName: selectedSocial.value.name,
         socialIcon: selectedSocial.value.icon,
-        url: socialUrl.value 
+        url: socialUrl.value,
+        order: maxOrderCount.value += 1
       }),
     })
     .then(() => {
@@ -131,20 +140,4 @@ import { doc, onSnapshot, updateDoc, arrayUnion } from "firebase/firestore";
   }
 </script>
 <style lang="scss">
-.highlight {
-  font-weight: 700;
-  color: #ff643a;
-  background: #f5f5f5;
-}
-
-.disabled {
-  background: #d4d4d4 !important;
-  pointer-events: none;
-}
-
-.next-btn {
-  font-weight: 700;
-  color: #ffffff;
-  background: #ff643a;
-}
 </style>
