@@ -42,7 +42,7 @@
                 >
                   <template #item="{ element }">
                     <li class="list-group-item d-flex">
-                      <div>
+                      <div style="width: 24px">
                         <img :src="matchSocial('icon', element)" :alt="matchSocial('icon', element)">
                       </div>
                       <div class="d-flex flex-column">

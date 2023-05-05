@@ -54,36 +54,20 @@ export default function() {
                   email: credentials.user.email,
                   emailVerified: credentials.user.emailVerified,
                   profileImage: downloadURL,
-                  profileLinks: arrayUnion({}),
-                  socialNetwork: arrayUnion({}),
+                  profileLinks: [],
+                  socialNetwork: [],
                 }).catch((error) => {
                   console.log(error.message);
                 });
               // Set data to contact info collection
                 await setDoc(doc($firestore, 'contact_info', credentials.user.uid), {
-                  address: arrayUnion({
-                    id: 1,
-                    type: 'Location',
-                    streetLine1: '',
-                    streetLine2: '',
-                    city: '',
-                    state: '',
-                    postCode: '',
-                    country: '',
-                  }),
+                  address: [],
                   email: arrayUnion({
                     id: 1,
                     email: credentials.user.email
                   }),
-                  phone: arrayUnion({
-                    id: 1,
-                    type: 'Cell Phone',
-                    value: ''
-                  }),
-                  website: arrayUnion({
-                    id: 1,
-                    url: ''
-                  }),
+                  phone: [],
+                  website: [],
                 }).catch((error) => {
                   console.log(error.message);
                 });

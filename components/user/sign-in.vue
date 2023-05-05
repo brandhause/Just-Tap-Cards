@@ -57,9 +57,10 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
   });
   const errorCode = ref(null);
 
+  const nuxtApp = useNuxtApp();
+
   async function signIn(user) {
-    const { auth } = useFirebase();
-    const cred = await signInWithEmailAndPassword(auth, user.email, user.password)
+    const cred = await signInWithEmailAndPassword(nuxtApp.$auth, user.email, user.password)
       .catch((err) => {
         errorCode.value = err.message;
       });

@@ -115,6 +115,7 @@ import { doc, onSnapshot, updateDoc, arrayUnion } from "firebase/firestore";
 
   const maxOrderCount = computed({
     get() {
+      if (!currentUser.value.socialNetwork.length) return;
       return currentUser.value.socialNetwork.sort((a, b) => b.order - a.order)[0].order;
     },
     set(newVal) {
