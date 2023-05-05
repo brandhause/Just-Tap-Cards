@@ -2,20 +2,18 @@
   <div>
     <div class="form-group" v-for="(field, index) in model" :key="index">
       <div class="d-flex justify-content-between">
-        <label class="my-1 mr-2">Phone</label>
+        <label class="my-1 mr-2">Website URL</label>
         <button @click.prevent="deleteField(index)">Delete X</button>
       </div>
-      <div class="d-flex">
-        <select class="form-control w-50" v-model="field.type">
-          <option :value="type.name" v-for="type in types" :key="type.id">
-            {{ type.name }}
-          </option>
-        </select>
-        <input class="form-control" type="text" v-model="field.value" />
-      </div>
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Website URL"
+        v-model="field.url"
+      >
     </div>
     <button class="mt-4 w-100 bg-transparent rounded" @click.prevent="addField">
-      + Add Phone
+      + Add Website
     </button>
   </div>
 </template>
@@ -24,7 +22,6 @@
   const emits = defineEmits(['input'])
   const props = defineProps({
     modelValue: Array,
-    types: Array,
   })
   
   const model = computed({
@@ -37,7 +34,7 @@
   })
 
   function addField() {
-    model.value.push({ id: model.value.length + 1, type: 'Cell Phone', value: '' })
+    model.value.push({ id: model.value.length + 1, url: '' })
   }
 
   function deleteField(index) {
