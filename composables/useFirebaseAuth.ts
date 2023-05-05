@@ -61,13 +61,29 @@ export default function() {
                 });
               // Set data to contact info collection
                 await setDoc(doc($firestore, 'contact_info', credentials.user.uid), {
-                  address: arrayUnion({}),
+                  address: arrayUnion({
+                    id: 1,
+                    type: 'Location',
+                    streetLine1: '',
+                    streetLine2: '',
+                    city: '',
+                    state: '',
+                    postCode: '',
+                    country: '',
+                  }),
                   email: arrayUnion({
                     id: 1,
                     email: credentials.user.email
                   }),
-                  phone: arrayUnion({}),
-                  website: arrayUnion({}),
+                  phone: arrayUnion({
+                    id: 1,
+                    type: 'Cell Phone',
+                    value: ''
+                  }),
+                  website: arrayUnion({
+                    id: 1,
+                    url: ''
+                  }),
                 }).catch((error) => {
                   console.log(error.message);
                 });

@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <form class="row justify-content-center" @submit.prevent="submitForm(contact)">
+    <form class="row mb-5 justify-content-center" @submit.prevent="submitForm(contact)">
       <div class="col-12">
         <nuxt-link class="arrow-back" to="/profile">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
@@ -10,34 +10,22 @@
       </div>
       <div class="col-12">
         <h3>Edit contact info</h3>
-        <InputsPhoneInput v-model="contact.phone" :phoneType="phoneType" />
+        <InputsPhoneInput v-model="contact.phone" :types="phoneType" />
       </div>
       <div class="col-12">
-        <div>
-          <h4>Email</h4>
-        </div>
-        <div>
-          <InputsKeyValue id="email" placeholder="Email" type="email" v-model="contact.email" />
-        </div>
+        <h5>Email</h5>
+        <InputsEmailInput v-model="contact.email" />
       </div>
       <div class="col-12">
-        <div>
-          <h4>Website</h4>
-        </div>
-        <div>
-          <InputsKeyValue id="website" placeholder="Website URL" v-model="contact.website" />
-        </div>
+        <h5>Website</h5>
+        <InputsWebsiteInput v-model="contact.website" />
       </div>
       <div class="col-12">
-        <div>
-          <h4>Address</h4>
-        </div>
-        <div>
-          <InputsAddressInput v-model="contact.address" :addressType="addressType" />
-        </div>
+        <h5>Address</h5>
+        <InputsAddressInput v-model="contact.address" :types="addressType" />
       </div>
-      <div class="col-12">
-        <button>Save</button>
+      <div class="col-12 mt-5">
+        <button type="submit" class="next-btn border-0 w-100 rounded">Save</button>
       </div>
     </form>
   </div>
@@ -49,17 +37,30 @@ import { doc, onSnapshot, updateDoc, arrayUnion } from "firebase/firestore"
   const phoneType = ref([])
   const addressType = ref([])
   const currentUser = ref([])
-  const nuxtApp = useNuxtApp();
+  const nuxtApp = useNuxtApp()
 
   const contact = ref({
-    address: {
-      type: 1,
-    },
-    email: '',
-    website: '',
-    phone: {
-      type: 1,
-    }
+    address: [
+      {
+        id: 1,
+        type: 1,
+        streetLine1: '',
+        streetLine2: '',
+        city: '',
+        state: '',
+        postCode: '',
+        country: '',
+      },
+    ],
+    email: [
+      { id: 1, email: ''},
+    ],
+    website: [
+      { id: 1, url: ''},
+    ],
+    phone: [
+      { id: 1, type: 1, value: '' },
+    ]
   })
 
   onMounted(() => {
@@ -72,13 +73,24 @@ import { doc, onSnapshot, updateDoc, arrayUnion } from "firebase/firestore"
           path: '/'
         });
       } else {
-        const docRef = doc(nuxtApp.$firestore, 'users', user.uid);
+        const docRef = doc(nuxtApp.$firestore, 'users', user.uid)
+        const contactRef = doc(nuxtApp.$firestore, 'contact_info', user.uid)
+
         onSnapshot(docRef,
           (snap) => {
             currentUser.value = {
               uid: user.uid,
               ...snap.data()
             }
+          },
+          (error) => {
+            //
+          },
+        );
+
+        onSnapshot(contactRef,
+          (snap) => {
+            contact.value = snap.data()
           },
           (error) => {
             //
@@ -108,13 +120,6 @@ import { doc, onSnapshot, updateDoc, arrayUnion } from "firebase/firestore"
   
   async function submitForm(contact) {
     const contactRef = doc(nuxtApp.$firestore, 'contact_info', currentUser.value.uid)
-    
-    await updateDoc(contactRef, {
-      address: arrayUnion(contact.address),
-      email: arrayUnion(contact.email),
-      website: arrayUnion(contact.email),
-      phone: arrayUnion(contact.phone)
-    })
-    // await updateDoc(doc(firestore, 'contact_info', currentUser.value.uid), contact.value)
+    await updateDoc(contactRef, contact);
   }
 </script>

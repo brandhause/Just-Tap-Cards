@@ -44,7 +44,7 @@
             <UserVideo :currentUser="currentUser" />
           </div>
           <div class="contact">
-            <UserContact :currentUser="currentUser" />
+            <UserContact :currentUser="currentUser" :contactInfo="contactInfo" />
           </div>
           <div>
             <button @click="logout">Logout</button>
@@ -61,6 +61,7 @@ import { doc, onSnapshot, updateDoc } from 'firebase/firestore'
   const nuxtApp = useNuxtApp();
   const errCode = ref();
   const currentUser = ref();
+  const contactInfo = ref();
 
   const fullName = computed(() => {
     if (!currentUser.value) return [];
@@ -75,12 +76,23 @@ import { doc, onSnapshot, updateDoc } from 'firebase/firestore'
         });
       } else {
         const docRef = doc(nuxtApp.$firestore, 'users', user.uid);
+        const contactRef = doc(nuxtApp.$firestore, 'contact_info', user.uid)
+
         onSnapshot(docRef,
           (snap) => {
             currentUser.value = {
               uid: user.uid,
               ...snap.data()
             }
+          },
+          (error) => {
+            //
+          },
+        );
+
+        onSnapshot(contactRef,
+          (snap) => {
+            contactInfo.value = snap.data()
           },
           (error) => {
             //
