@@ -64,7 +64,8 @@ export default function() {
                   address: [],
                   email: arrayUnion({
                     id: 1,
-                    email: credentials.user.email
+                    email: credentials.user.email,
+                    order: 1,
                   }),
                   phone: [],
                   website: [],
