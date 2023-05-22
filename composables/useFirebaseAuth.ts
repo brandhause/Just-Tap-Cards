@@ -50,12 +50,17 @@ export default function() {
             getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
               // Set data to users collection
                 await setDoc(doc($firestore, 'users', credentials.user.uid), {
-                  displayName: user.fname + ' ' + user.lname,
-                  email: credentials.user.email,
-                  emailVerified: credentials.user.emailVerified,
-                  profileImage: downloadURL,
-                  profileLinks: [],
-                  socialNetwork: [],
+                  profile: arrayUnion({
+                    id: 1,
+                    live: true,
+                    slug: generateRandomSlug(user.fname + user.lname),
+                    displayName: user.fname + ' ' + user.lname,
+                    email: credentials.user.email,
+                    emailVerified: credentials.user.emailVerified,
+                    profileImage: downloadURL,
+                    profileLinks: [],
+                    socialNetwork: [],
+                  })
                 }).catch((error) => {
                   console.log(error.message);
                 });
@@ -86,7 +91,21 @@ export default function() {
     return false
   }
 
+  const generateRandomSlug = (characters) => {
+    // const characters = 'abcdefghijklmnopqrstuvwxyz';
+    const slugLength = 16;
+    let slug = '';
+  
+    for (let i = 0; i < slugLength; i++) {
+      const randomIndex = Math.floor(Math.random() * characters.length);
+      slug += characters[randomIndex];
+    }
+  
+    return slug;
+  }
+
   return {
-    registerUser
+    registerUser,
+    generateRandomSlug
   }
 }

@@ -1,16 +1,23 @@
 <template>
-  <div v-if="currentUser">
+  <div v-if="liveProfile">
     <div class="container my-5">
       <div class="row justify-content-center">
         <div class="col-md-6">
-          <div>
-            <nuxt-link to="/">Home</nuxt-link>
+          <div class="text-center">
+            <button
+              class="d-flex align-items-center border-0 bg-transparent mx-auto"
+              @click="toggleSwitchProfile"
+            >
+              Switch Profile
+              <svg width="16" height="8" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd">
+                <path d="M23.245 4l-11.245 14.374-11.219-14.374-.781.619 12 15.381 12-15.391-.755-.609z" />
+              </svg>
+            </button>
           </div>
           <div class="welcome-text">
-            <h2>Hello {{ fullName[0] }}!</h2>
+            <h2 v-show="fullName[0]">Hi {{ fullName[0] }}!</h2>
             <p>This is your profile where you can make changes anytime. Enjoy making new connections!</p>
           </div>
-          
           
           <div class="profile-details">
             <nuxt-link class="edit-profile-link" to="/profile/edit-card-details">
@@ -19,32 +26,32 @@
               </svg>
             </nuxt-link>
             <div class="profile-img mx-auto">
-              <img :src="currentUser.profileImage" />
+              <img :src="liveProfile.profileImage" />
             </div>
             <div class="profile-info">
               <h2>
                 {{ fullName[0] }}
                 <br />
                 {{ fullName[1] }}
-                <span class="job-title">{{ currentUser.jobTitle }}</span>
-                <span v-if="currentUser.company"> At {{ currentUser.company }}</span>
+                <span class="job-title">{{ liveProfile.jobTitle }}</span>
+                <span v-if="liveProfile.company"> At {{ liveProfile.company }}</span>
               </h2>
             </div>
           </div>
           <div class="user-bio">
-            <UserBio :currentUser="currentUser" />
+            <UserBio :currentUser="liveProfile" />
           </div>
           <div class="social-media">
-            <UserSocialMedia :currentUser="currentUser" />
+            <UserSocialMedia :currentUser="liveProfile" />
           </div>
           <div class="links">
-            <UserLinks :currentUser="currentUser" />
+            <UserLinks :currentUser="liveProfile" />
           </div>
           <div class="video">
-            <UserVideo :currentUser="currentUser" />
+            <UserVideo :currentUser="liveProfile" />
           </div>
           <div class="contact">
-            <UserContact :currentUser="currentUser" :contactInfo="contactInfo" />
+            <UserContact :currentUser="liveProfile" :contactInfo="contactInfo" />
           </div>
           <div>
             <button @click="logout">Logout</button>
@@ -52,21 +59,65 @@
         </div>
       </div>
     </div>
+    <Modal radius="8px 8px 0 0" align="end" v-if="modal" @closeModal="closeSwitchProfile">
+      <div class="d-flex flex-column h-100">
+        <h4 class="mb-0 mt-3" style="font-weight: 900">Switch Profile</h4>
+        <small>Your cards are linked to your LIVE profile. To switch your LIVE profile, select a profile below.</small>
+        <div
+          class="d-flex align-items-center mt-3"
+          style="gap: 10px; cursor: pointer"
+          v-for="profile in currentUser.profile"
+          :key="profile.id"
+          @click="updateProfile(profile.id)"
+        >
+          <div style="width: 40px; height: 40px">
+            <img
+              :src="profile.profileImage"
+              width="40"
+              height="40"
+              style="object-fit: cover; max-width: 100%; border-radius: 4px"
+            />
+          </div>
+          <div>
+            <small><strong>/{{ profile.slug }}</strong></small>
+            <div class="text-capitalize">{{ profile.displayName }}</div>
+          </div>
+          <div v-show="profile.live" class="text-white px-2 rounded" style="background: #3EB244; margin-left: auto">
+            <small class="text-uppercase">Live</small>
+          </div>
+        </div>
+        <nuxt-link
+          to="/profile/manage-profiles"
+          class="border w-100 bg-transparent rounded py-2 mt-auto text-center"
+          style="font-weight: 900"
+        >
+          <small>Manage Profiles</small>
+        </nuxt-link>
+      </div>
+    </Modal>
+    <Alert :state="success"></Alert>
   </div>
 </template>
 <script setup>
 import { onAuthStateChanged } from 'firebase/auth'
-import { doc, onSnapshot, updateDoc } from 'firebase/firestore'
+import { arrayRemove, arrayUnion, doc, onSnapshot, setDoc, updateDoc } from 'firebase/firestore'
 
   const nuxtApp = useNuxtApp();
   const errCode = ref();
   const currentUser = ref();
   const contactInfo = ref();
+  const modal = ref(false);
+  const success = ref();
 
   const fullName = computed(() => {
-    if (!currentUser.value) return [];
-    return currentUser.value.displayName.split(' ');
+    if (liveProfile.value.length === 0) return [];
+    return liveProfile.value.displayName.split(' ');
   });
+
+  const liveProfile = computed(() => {
+    if (!currentUser.value || !currentUser.value.profile) return [];
+    return currentUser.value.profile.find((u) => u.live);
+  })
 
   onMounted(async () => {
     onAuthStateChanged(nuxtApp.$auth, (user) => {
@@ -104,6 +155,34 @@ import { doc, onSnapshot, updateDoc } from 'firebase/firestore'
 
   async function logout() {
     await nuxtApp.$auth.signOut()
+  }
+
+  function toggleSwitchProfile() {
+    modal.value = !modal.value;
+  }
+
+  function closeSwitchProfile() {
+    modal.value = false;
+  }
+
+  async function updateProfile(id) {
+    currentUser.value.profile.forEach(async (p) => {
+      const existing = p;
+      modal.value = false;
+      await updateDoc(doc(nuxtApp.$firestore, 'users', currentUser.value.uid), {
+        profile: arrayUnion({ ...p, live: p.id === id })
+      })
+      .then(async () => {
+        success.value = 'success';
+        setTimeout(() => {
+          success.value = null;
+        }, 5000);
+        await updateDoc(doc(nuxtApp.$firestore, 'users', currentUser.value.uid), {
+          profile: arrayRemove(existing)
+        })
+      })
+      .catch((err) => console.log(err));
+    })
   }
 
   async function edit(user) {
