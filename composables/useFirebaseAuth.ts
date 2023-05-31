@@ -53,7 +53,7 @@ export default function() {
                   profile: arrayUnion({
                     id: 1,
                     live: true,
-                    slug: generateRandomSlug(user.fname + user.lname),
+                    slug: generateRandomSlug(),
                     displayName: user.fname + ' ' + user.lname,
                     email: credentials.user.email,
                     emailVerified: credentials.user.emailVerified,
@@ -91,8 +91,8 @@ export default function() {
     return false
   }
 
-  const generateRandomSlug = (characters) => {
-    // const characters = 'abcdefghijklmnopqrstuvwxyz';
+  const generateRandomSlug = () => {
+    const characters = 'abcdefghijklmnopqrstuvwxyz';
     const slugLength = 16;
     let slug = '';
   

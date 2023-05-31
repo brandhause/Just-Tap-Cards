@@ -56,6 +56,7 @@
                       v-if="!profile.live"
                       class="position-absolute d-flex align-items-center justify-content-center text-white rounded-circle"
                       style="right: -20px; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; background: #686868; cursor: pointer"
+                      @click="removeProfile(profile)"
                     >
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd">
                         <path d="M19 24h-14c-1.104 0-2-.896-2-2v-17h-1v-2h6v-1.5c0-.827.673-1.5 1.5-1.5h5c.825 0 1.5.671 1.5 1.5v1.5h6v2h-1v17c0 1.104-.896 2-2 2zm-14-2.5c0 .276.224.5.5.5h13c.276 0 .5-.224.5-.5v-16.5h-14v16.5zm5-18.5h4v-1h-4v1z" />
@@ -86,7 +87,7 @@
 </template>
 <script setup>
 import { onAuthStateChanged } from 'firebase/auth';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot, updateDoc, arrayRemove } from 'firebase/firestore';
 
   const nuxtApp = useNuxtApp();
   const currentUser = ref();
@@ -115,4 +116,13 @@ import { doc, onSnapshot } from 'firebase/firestore';
     });
   })
 
+  async function removeProfile(profile) {
+    try {
+      await updateDoc(doc(nuxtApp.$firestore, 'users', currentUser.value.uid), {
+        profile: arrayRemove(profile)
+      })
+    } catch (error) {
+      console.log(error)
+    }
+  }
 </script>

@@ -82,7 +82,9 @@ import { doc, onSnapshot, arrayUnion, updateDoc } from 'firebase/firestore';
   const currentUrl = ref()
 
   onUpdated(() => {
-    if (step.value === 1) handleClick()
+    if (step.value === 1) {
+      handleClick()
+    }
   })
 
   onMounted(() => {
@@ -95,7 +97,7 @@ import { doc, onSnapshot, arrayUnion, updateDoc } from 'firebase/firestore';
         });
       } else {
         const docRef = doc(nuxtApp.$firestore, 'users', user.uid);
-
+        
         onSnapshot(docRef,
           (snap) => {
             currentUser.value = {
@@ -109,7 +111,9 @@ import { doc, onSnapshot, arrayUnion, updateDoc } from 'firebase/firestore';
         );
       }
     });
-
+    setTimeout(() => {
+      createNewProfile()
+    }, 500);
   })
 
   function generateRandomSlug() {
@@ -126,12 +130,12 @@ import { doc, onSnapshot, arrayUnion, updateDoc } from 'firebase/firestore';
   }
 
   async function createNewProfile() {
-    let idCount = currentUser.value.length
-    if (idCount === 3) return;
-
+    if (currentUser.value && currentUser.value.profile.length === 3) {
+      return;
+    }
     await updateDoc(doc(nuxtApp.$firestore, 'users', currentUser.value.uid), {
       profile: arrayUnion({
-        id: idCount + 1,
+        id: currentUser.value.profile.length += 1,
         live: false,
         slug: generateRandomSlug(),
         profileLinks: [],

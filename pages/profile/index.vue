@@ -110,7 +110,7 @@ import { arrayRemove, arrayUnion, doc, onSnapshot, updateDoc } from 'firebase/fi
   const success = ref();
 
   const fullName = computed(() => {
-    if (liveProfile.value.length === 0) return [];
+    if (liveProfile.value.length === 0 || !liveProfile.value.displayName) return [];
     return liveProfile.value.displayName.split(' ');
   });
 
