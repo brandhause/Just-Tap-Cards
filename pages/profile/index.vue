@@ -100,7 +100,7 @@
 </template>
 <script setup>
 import { onAuthStateChanged } from 'firebase/auth'
-import { arrayRemove, arrayUnion, doc, onSnapshot, setDoc, updateDoc } from 'firebase/firestore'
+import { arrayRemove, arrayUnion, doc, onSnapshot, updateDoc } from 'firebase/firestore'
 
   const nuxtApp = useNuxtApp();
   const errCode = ref();

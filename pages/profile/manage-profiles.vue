@@ -24,7 +24,7 @@
                     {{ profile.slug }}
                   </option>
                 </select>
-                <div v-for="profile in currentUser.profile" :key="profile.id" class="mt-3">
+                <div v-for="profile in currentUser.profile" :key="profile.id" class="mt-4">
                   <div
                     class="d-flex align-items-stretch position-relative"
                     style="border-radius: 20px"
@@ -63,6 +63,20 @@
                     </div>
                   </div>
                 </div>
+                <div class="mt-4">
+                  <nuxt-link
+                    to="/card/setup"
+                    class="d-flex w-100 justify-content-between border rounded"
+                    style="padding: 30px 16px; box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.12); font-weight: 900"
+                  >
+                    Create New Profile
+                    <span style="color: #FF643A">
+                      <svg height="20" width="20" fill="currentColor" clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="m11 11h-7.25c-.414 0-.75.336-.75.75s.336.75.75.75h7.25v7.25c0 .414.336.75.75.75s.75-.336.75-.75v-7.25h7.25c.414 0 .75-.336.75-.75s-.336-.75-.75-.75h-7.25v-7.25c0-.414-.336-.75-.75-.75s-.75.336-.75.75z" fill-rule="nonzero" />
+                      </svg>
+                    </span>
+                  </nuxt-link>
+                </div>
               </div>
             </div>
           </div>
@@ -100,4 +114,5 @@ import { doc, onSnapshot } from 'firebase/firestore';
       }
     });
   })
+
 </script>
