@@ -1,9 +1,5 @@
 <template>
   <div class="text-center">
-    <h1 v-show="currentUser">Hello {{ currentUser ? currentUser.displayName : 'World' }}!</h1>
-    <div v-show="currentUser">
-      <nuxt-link to="/profile">View Profile</nuxt-link>
-    </div>
     <div v-show="!currentUser">
       <UserSignIn v-if="!getQuery"></UserSignIn>
       <UserSignUp v-if="getQuery"></UserSignUp>
@@ -33,6 +29,7 @@ import { doc, onSnapshot } from "firebase/firestore";
               uid: user.uid,
               ...snap.data()
             }
+            return navigateTo('/profile');
           },
           (error) => {
             //
