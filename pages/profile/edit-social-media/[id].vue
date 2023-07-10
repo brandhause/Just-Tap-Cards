@@ -45,9 +45,14 @@ import { doc, onSnapshot, updateDoc, arrayUnion, arrayRemove } from "firebase/fi
     })
   })
 
+  const liveProfile = computed(() => {
+    if (!currentUser.value || !currentUser.value.profile) return [];
+    return currentUser.value.profile.find((u) => u.live);
+  })
+
   const filteredSocial = computed(() => {
-    if (!currentUser.value) return [];
-    return currentUser.value.socialNetwork.find((s) => {
+    if (!liveProfile.value) return [];
+    return liveProfile.value.socialNetwork.find((s) => {
       return s.id === +route.params.id; // convert to number
     });
   })
@@ -84,19 +89,21 @@ import { doc, onSnapshot, updateDoc, arrayUnion, arrayRemove } from "firebase/fi
 
   async function addSocialNetwork() {
     const socialRef = doc(nuxtApp.$firestore, 'users', currentUser.value.uid);
+    const profile = currentUser.value.profile;
+    const index = profile.findIndex(item => item.id === liveProfile.value.id);
+    profile[index].socialNetwork.find(social => social.id === +route.params.id).url = socialUrl.value
     
-    // add new object to array with the same id but different urk value
     await updateDoc(socialRef, {
-      socialNetwork: arrayUnion({ ...filteredSocial.value, url: socialUrl.value }),
+      profile: profile,
     }).then(() => {
       return navigateTo('/profile/edit-social-media');
     })
     .catch((err) => console.log(err.message));
 
     // remove existing array object
-    await updateDoc(socialRef, {
-      socialNetwork: arrayRemove(filteredSocial.value)
-    }).catch((err) => console.log(err.message));
+    // await updateDoc(socialRef, {
+    //   socialNetwork: arrayRemove(filteredSocial.value)
+    // }).catch((err) => console.log(err.message));
 
   }
 </script>

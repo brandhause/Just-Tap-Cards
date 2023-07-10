@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div>
     <div class="row">
       <div class="col-md-12">
         <nuxt-link class="arrow-back" to="/profile/edit-social-media" v-if="!toggleNext">
@@ -113,10 +113,15 @@ import { doc, onSnapshot, updateDoc, arrayUnion } from "firebase/firestore";
     });
   }
 
+  const liveProfile = computed(() => {
+    if (!currentUser.value || !currentUser.value.profile) return [];
+    return currentUser.value.profile.find((u) => u.live);
+  })
+
   const maxOrderCount = computed({
     get() {
-      if (!currentUser.value.socialNetwork.length) return;
-      return currentUser.value.socialNetwork.sort((a, b) => b.order - a.order)[0].order;
+      if (!liveProfile.value.socialNetwork.length) return;
+      return liveProfile.value.socialNetwork.sort((a, b) => b.order - a.order)[0].order;
     },
     set(newVal) {
       return newVal
@@ -124,16 +129,17 @@ import { doc, onSnapshot, updateDoc, arrayUnion } from "firebase/firestore";
   })
 
   async function addSocialNetwork() {
-    await updateDoc(doc(nuxtApp.$firestore, 'users', currentUser.value.uid), {
-      socialNetwork: arrayUnion({
-        id: Math.floor(Math.random() * Math.floor(Math.random() * Date.now())), // generate random id
-        socialId: selectedSocial.value.id,
-        socialName: selectedSocial.value.name,
-        socialIcon: selectedSocial.value.icon,
-        url: socialUrl.value,
-        order: maxOrderCount.value ? maxOrderCount.value += 1 : 1
-      }),
+    const profile = currentUser.value.profile;
+    const index = profile.findIndex(item => item.id === liveProfile.value.id);
+    profile[index].socialNetwork.push({
+      id: Math.floor(Math.random() * Math.floor(Math.random() * Date.now())), // generate random id
+      socialId: selectedSocial.value.id,
+      socialName: selectedSocial.value.name,
+      socialIcon: selectedSocial.value.icon,
+      url: socialUrl.value,
+      order: maxOrderCount.value ? maxOrderCount.value += 1 : 1
     })
+    await updateDoc(doc(nuxtApp.$firestore, 'users', currentUser.value.uid), { profile: profile })
     .then(() => {
       return navigateTo('/profile/edit-social-media');
     })
