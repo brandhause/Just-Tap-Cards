@@ -38,9 +38,11 @@
 
 <script setup>
 import draggable from 'vuedraggable';
-import { onAuthStateChanged } from 'firebase/auth';
-import { doc, onSnapshot, updateDoc, arrayRemove, arrayUnion } from "firebase/firestore";
-  
+import { doc, onSnapshot } from "firebase/firestore";
+import useFirestore from '~/composables/useFirestore.ts';
+
+  const { update } = useFirestore();
+  const liveProfile = ref();
   const currentUser = ref();
   const errCode = ref();
   const drag = ref(false);
@@ -59,11 +61,6 @@ import { doc, onSnapshot, updateDoc, arrayRemove, arrayUnion } from "firebase/fi
     };
   });
 
-  const liveProfile = computed(() => {
-    if (!currentUser.value || !currentUser.value.profile) return [];
-    return currentUser.value.profile.find((u) => u.live);
-  })
-
   const itemList = computed({
     get() {
       return liveProfile.value.socialNetwork.sort((a, b) => a.order - b.order);
@@ -76,46 +73,29 @@ import { doc, onSnapshot, updateDoc, arrayRemove, arrayUnion } from "firebase/fi
   async function updateOrder(newVal) {
     const items = newVal;
     items.forEach((item, index) => {
-      return item.order = index += 1
-    })
+      return item.order = index += 1;
+    });
 
     const profile = currentUser.value.profile;
     const index = profile.findIndex(item => item.id === liveProfile.value.id);
 
-    profile[index].socialNetwork = items
+    profile[index].socialNetwork = items;
     
-    const socialRef = doc(nuxtApp.$firestore, 'users', currentUser.value.uid);
-    await updateDoc(socialRef, {
-      profile: profile
-    })
+    await update(currentUser.value.uid, profile);
   }
 
-  onMounted(async () => {
-    onAuthStateChanged(nuxtApp.$auth, (user) => {
-      if (!user) {
-        return navigateTo({
-          path: '/'
-        });
-      } else {
-        const docRef = doc(nuxtApp.$firestore, 'users', user.uid);
-        onSnapshot(docRef,
-          (snap) => {
-            currentUser.value = {
-            uid: user.uid,
-            ...snap.data()
-            }
-          },
-          (error) => {
-            //
-          },
-        );
-        
-        const socialRef = doc(nuxtApp.$firestore, 'social_network', 'social_doc');
-        onSnapshot(socialRef, (snap) => {
-          socialNetworks.value = snap.data().data;
-        })
-      }
-    });
+  function refresh() {
+    currentUser.value = JSON.parse(localStorage.getItem('profiles'));
+    liveProfile.value = JSON.parse(localStorage.getItem('live-profile'));
+  }
+
+  onMounted(() => {
+    refresh();
+
+    const socialRef = doc(nuxtApp.$firestore, 'social_network', 'social_doc');
+    onSnapshot(socialRef, (snap) => {
+      socialNetworks.value = snap.data().data;
+    })
   })
   
   function matchSocial(id, social) {
@@ -134,14 +114,15 @@ import { doc, onSnapshot, updateDoc, arrayRemove, arrayUnion } from "firebase/fi
     const profile = currentUser.value.profile;
     const index = profile.findIndex(item => item.id === liveProfile.value.id);
     const toDelete = profile[index].socialNetwork.findIndex(s => s.id === social.id);
+
     if (toDelete !== -1) {
       profile[index].socialNetwork.splice(toDelete, 1)
     }
-    const socialRef = doc(nuxtApp.$firestore, 'users', currentUser.value.uid);
 
-    await updateDoc(socialRef, {
-      profile: profile
-    })
+    const res = await update(currentUser.value.uid, profile);
+    if (res === 'ok') {
+      refresh()
+    }
   }
 
 </script>

@@ -28,14 +28,16 @@
   </div>
 </template>
 <script setup>
-import { onAuthStateChanged } from 'firebase/auth';
-import { doc, onSnapshot, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
+import { doc, onSnapshot } from "firebase/firestore";
+import useFirestore from '~/composables/useFirestore.ts';
 
+  const { update } = useFirestore();
   const nuxtApp = useNuxtApp();
   const route = useRoute();
   const id = ref();
   const socialUrl = ref();
   const socialNetworks = ref([]);
+  const liveProfile = ref();
   const currentUser = ref();
 
   const social = computed(() => {
@@ -45,11 +47,6 @@ import { doc, onSnapshot, updateDoc, arrayUnion, arrayRemove } from "firebase/fi
     })
   })
 
-  const liveProfile = computed(() => {
-    if (!currentUser.value || !currentUser.value.profile) return [];
-    return currentUser.value.profile.find((u) => u.live);
-  })
-
   const filteredSocial = computed(() => {
     if (!liveProfile.value) return [];
     return liveProfile.value.socialNetwork.find((s) => {
@@ -57,53 +54,26 @@ import { doc, onSnapshot, updateDoc, arrayUnion, arrayRemove } from "firebase/fi
     });
   })
 
-  onMounted(async () => {
+  onMounted(() => {
+    currentUser.value = JSON.parse(localStorage.getItem('profiles'));
+    liveProfile.value = JSON.parse(localStorage.getItem('live-profile'));
 
-    onAuthStateChanged(nuxtApp.$auth, (user) => {
-      if (!user) {
-        return navigateTo({
-          path: '/'
-        });
-      } else {
-        const docRef = doc(nuxtApp.$firestore, 'users', user.uid);
-          onSnapshot(docRef,
-            (snap) => {
-              currentUser.value = {
-                uid: user.uid,
-                ...snap.data()
-              }
-              socialUrl.value = socialUrl.value || filteredSocial.value.url;
-            },
-            (error) => {
-              //
-            },
-        );
-        
-        const socialRef = doc(nuxtApp.$firestore, 'social_network', 'social_doc');
-        onSnapshot(socialRef, (snap) => {
-          socialNetworks.value = snap.data().data;
-        })
-      }
-    });
+    const socialRef = doc(nuxtApp.$firestore, 'social_network', 'social_doc');
+    onSnapshot(socialRef, (snap) => {
+      socialNetworks.value = snap.data().data;
+    })
+
+    socialUrl.value = socialUrl.value || filteredSocial.value.url;
   })
 
   async function addSocialNetwork() {
-    const socialRef = doc(nuxtApp.$firestore, 'users', currentUser.value.uid);
     const profile = currentUser.value.profile;
     const index = profile.findIndex(item => item.id === liveProfile.value.id);
-    profile[index].socialNetwork.find(social => social.id === +route.params.id).url = socialUrl.value
+    profile[index].socialNetwork.find(social => social.id === +route.params.id).url = socialUrl.value;
     
-    await updateDoc(socialRef, {
-      profile: profile,
-    }).then(() => {
+    const res = await update(currentUser.value.uid, profile);
+    if (res === 'ok') {
       return navigateTo('/profile/edit-social-media');
-    })
-    .catch((err) => console.log(err.message));
-
-    // remove existing array object
-    // await updateDoc(socialRef, {
-    //   socialNetwork: arrayRemove(filteredSocial.value)
-    // }).catch((err) => console.log(err.message));
-
+    }
   }
 </script>

@@ -95,62 +95,47 @@
   </div>
 </template>
 <script setup>
-import { onAuthStateChanged } from 'firebase/auth'
-import { arrayRemove, arrayUnion, doc, onSnapshot, updateDoc } from 'firebase/firestore'
+import { doc, onSnapshot } from 'firebase/firestore';
+import useFirestore from '~/composables/useFirestore.ts';
 
+  const { update } = useFirestore();
   const nuxtApp = useNuxtApp();
   const errCode = ref();
   const currentUser = ref();
   const contactInfo = ref();
   const modal = ref(false);
   const success = ref();
+  const liveProfile = ref();
 
   const fullName = computed(() => {
     if (liveProfile.value.length === 0 || !liveProfile.value.displayName) return [];
     return liveProfile.value.displayName.split(' ');
   });
 
-  const liveProfile = computed(() => {
-    if (!currentUser.value || !currentUser.value.profile) return [];
-    return currentUser.value.profile.find((u) => u.live);
-  })
+  function refresh() {
+    currentUser.value = JSON.parse(localStorage.getItem('profiles'));
+    liveProfile.value = JSON.parse(localStorage.getItem('live-profile'));
+
+    const contactRef = doc(nuxtApp.$firestore, 'contact_info', liveProfile.value.slug);
+
+    onSnapshot(contactRef,
+      (snap) => {
+        contactInfo.value = snap.data()
+      },
+      (error) => {
+        //
+      },
+    );
+  }
 
   onMounted(async () => {
-    onAuthStateChanged(nuxtApp.$auth, (user) => {
-      if (!user) {
-        return navigateTo({
-          path: '/'
-        });
-      } else {
-        const docRef = doc(nuxtApp.$firestore, 'users', user.uid);
-        const contactRef = doc(nuxtApp.$firestore, 'contact_info', user.uid)
-
-        onSnapshot(docRef,
-          (snap) => {
-            currentUser.value = {
-              uid: user.uid,
-              ...snap.data()
-            }
-          },
-          (error) => {
-            //
-          },
-        );
-
-        onSnapshot(contactRef,
-          (snap) => {
-            contactInfo.value = snap.data()
-          },
-          (error) => {
-            //
-          },
-        );
-      }
-    });
+    refresh();
   })
 
   async function logout() {
     await nuxtApp.$auth.signOut()
+    localStorage.removeItem('profiles')
+    localStorage.removeItem('live-profile')
   }
 
   function toggleSwitchProfile() {
@@ -162,23 +147,23 @@ import { arrayRemove, arrayUnion, doc, onSnapshot, updateDoc } from 'firebase/fi
   }
 
   async function updateProfile(id) {
-    currentUser.value.profile.forEach(async (p) => {
-      const existing = p;
-      modal.value = false;
-      await updateDoc(doc(nuxtApp.$firestore, 'users', currentUser.value.uid), {
-        profile: arrayUnion({ ...p, live: p.id === id })
-      })
-      .then(async () => {
-        success.value = 'success';
-        setTimeout(() => {
-          success.value = null;
-        }, 5000);
-        await updateDoc(doc(nuxtApp.$firestore, 'users', currentUser.value.uid), {
-          profile: arrayRemove(existing)
-        })
-      })
-      .catch((err) => console.log(err));
+    const profile = currentUser.value;
+    profile.profile.forEach(async (p) => {
+      p.live = p.id === id;
     })
+
+    await update(currentUser.value.uid, profile.profile)
+      .then((res) => {
+        if (res === 'ok') {
+          refresh();
+          modal.value = false;
+          success.value = 'success';
+          
+          setTimeout(() => {
+            success.value = null;
+          }, 5000);
+        }
+      })
   }
 
   async function edit(user) {

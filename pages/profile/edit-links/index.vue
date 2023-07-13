@@ -42,11 +42,11 @@
 
 <script setup>
 import draggable from 'vuedraggable';
-import { onAuthStateChanged } from 'firebase/auth';
-import { doc, onSnapshot, updateDoc, arrayRemove, arrayUnion } from "firebase/firestore";
+import useFirestore from '~/composables/useFirestore.ts';
 
-  const nuxtApp = useNuxtApp();
+  const { update } = useFirestore();
   const drag = ref(false);
+  const liveProfile = ref();
   const currentUser = ref();
   const toggleEdit = ref(false);
   const errCode = ref();
@@ -61,33 +61,13 @@ import { doc, onSnapshot, updateDoc, arrayRemove, arrayUnion } from "firebase/fi
     };
   });
 
-  onMounted(async () => {
+  function refresh() {
+    currentUser.value = JSON.parse(localStorage.getItem('profiles'));
+    liveProfile.value = JSON.parse(localStorage.getItem('live-profile'));
+  }
 
-    onAuthStateChanged(nuxtApp.$auth, (user) => {
-      if (!user) {
-        return navigateTo({
-          path: '/'
-        });
-      } else {
-        const docRef = doc(nuxtApp.$firestore, 'users', user.uid);
-        onSnapshot(docRef,
-          (snap) => {
-            currentUser.value = {
-            uid: user.uid,
-            ...snap.data()
-            }
-          },
-          (error) => {
-            //
-          },
-        );
-      }
-    });
-  })
-
-  const liveProfile = computed(() => {
-    if (!currentUser.value || !currentUser.value.profile) return [];
-    return currentUser.value.profile.find((u) => u.live);
+  onMounted(() => {
+    refresh();
   })
 
   const itemList = computed({
@@ -110,24 +90,22 @@ import { doc, onSnapshot, updateDoc, arrayRemove, arrayUnion } from "firebase/fi
 
     profile[index].profileLinks = items
 
-    const docRef = doc(nuxtApp.$firestore, 'users', currentUser.value.uid);
-    await updateDoc(docRef, {
-      profile: profile
-    })
+    await update(currentUser.value.uid, profile)
   }
 
   async function deleteLink(link) {
     const profile = currentUser.value.profile;
     const index = profile.findIndex(item => item.id === liveProfile.value.id);
     const toDelete = profile[index].profileLinks.findIndex(s => s.id === link.id);
+
     if (toDelete !== -1) {
       profile[index].profileLinks.splice(toDelete, 1)
     }
-    const linkRef = doc(nuxtApp.$firestore, 'users', currentUser.value.uid);
 
-    await updateDoc(linkRef, {
-      profile: profile
-    })
+    const res = await update(currentUser.value.uid, profile);
+    if (res === 'ok') {
+      refresh();
+    }
   }
 
 </script>

@@ -9,40 +9,18 @@
 <script setup>
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, onSnapshot, updateDoc } from "firebase/firestore";
+import useFirestore from '~/composables/useFirestore.ts';
 
+  const { update } = useFirestore();
+  const liveProfile = ref();
   const currentUser = ref();
   const toggleEdit = ref(false);
   const errCode = ref();
-
   const nuxtApp = useNuxtApp();
 
-  const liveProfile = computed(() => {
-    if (!currentUser.value || !currentUser.value.profile) return [];
-    return currentUser.value.profile.find((u) => u.live);
-  })
-
   onMounted(async () => {
-
-    onAuthStateChanged(nuxtApp.$auth, (user) => {
-      if (!user) {
-        return navigateTo({
-          path: '/'
-        });
-      } else {
-        const docRef = doc(nuxtApp.$firestore, 'users', user.uid);
-        onSnapshot(docRef,
-          (snap) => {
-            currentUser.value = {
-              uid: user.uid,
-              ...snap.data()
-            }
-          },
-          (error) => {
-            //
-          },
-        );
-      }
-    });
+    currentUser.value = JSON.parse(localStorage.getItem('profiles'));
+    liveProfile.value = JSON.parse(localStorage.getItem('live-profile'));
   })
 
   async function logout() {
@@ -50,9 +28,11 @@ import { doc, onSnapshot, updateDoc } from "firebase/firestore";
   }
 
   async function editVideo(user) {
-    await updateDoc(doc(nuxtApp.$firestore, 'users', currentUser.value.uid), {
-      video: user.video,
-      videoDescription: user.videoDescription,
-    }).catch((err) => errCode.value = err.message);
+    const profile = currentUser.value.profile;
+    const index = profile.findIndex(item => item.id === liveProfile.value.id);
+    profile[index].video = user.video;
+    profile[index].videoDescription = user.videoDescription
+
+    await update(currentUser.value.uid, profile)
   }
 </script>

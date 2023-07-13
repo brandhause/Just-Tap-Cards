@@ -12,7 +12,7 @@
 <script setup>
 import Cropper from 'cropperjs';
 
-  const emit = defineEmits(['childEvent']);
+  const emit = defineEmits(['childEvent', 'imageCropped']);
   let imageCrop = ref();
   let cropper = '';
   let croppable = false;
@@ -26,13 +26,11 @@ import Cropper from 'cropperjs';
   function save() {
     croppedImage.value = cropper.getCroppedCanvas().toDataURL('image/jpeg');
     emit('imageCropped', croppedImage.value);
-    console.log(croppedImage.value);
   }
 
   onMounted(async () => {
     const image = imageCrop.value;
-    console.log(image);
-    if(image) {
+    if (image) {
       cropper = new Cropper(image, {
         dragMode: 'move',
         dragCrop: false,
@@ -62,8 +60,7 @@ import Cropper from 'cropperjs';
           console.log(event.detail.height)
         }
       })
-      console.log(cropper);
-    }else {
+    } else {
       console.log('please upload a file');
     }
   })
