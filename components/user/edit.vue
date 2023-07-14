@@ -1,11 +1,11 @@
 <template>
   <div>
-    <form @submit.prevent="edit(user)">
+    <form @submit.prevent="edit(user, uploadedFiles)">
 			<div class="crop-container mx-auto" style="max-height: 300px max-width: 300px">
 				<img class="mb-5" ref="imageCrop" :src="user.profileImage" crossorigin>
 			</div>
-			<button @click="cropImage">Crop</button>
-      <button @click="enableCropper">Enable</button>
+			<button @click.prevent="cropImage">Crop</button>
+      <button @click.prevent="enableCropper">Enable</button>
       <div>
         <label for="first-name">First name:</label>
         <input type="text" id="first-name" name="first-name" class="form-control mb-3" v-model="user.fname" />
@@ -38,7 +38,15 @@ import Cropper from 'cropperjs';
     currentUser: [Array, Object],
   });
 
-  const user = ref({});
+  const user = ref({
+    fname: props.currentUser.displayName.split(' ')[0] || '',
+    lname: props.currentUser.displayName.split(' ')[1] || '',
+    jobTitle: props.currentUser.jobTitle || '',
+    company: props.currentUser.company || '',
+    industryOrCategoryOfWork: props.currentUser.industryOrCategoryOfWork || '',
+    profileImage: props.currentUser.profileImage || ''
+  });
+  const uploadedFiles = ref({});
   let imageCrop = ref();
   let cropper = '';
   let croppable = false;
@@ -67,13 +75,13 @@ import Cropper from 'cropperjs';
 		const canvas = cropper.getCroppedCanvas();
 		const roundedCanvas = getRoundedCanvas(canvas);
 
-      	const dataUrl = roundedCanvas.toDataURL('image/jpeg')
-      	console.log(dataUrl)
+    const dataUrl = roundedCanvas.toDataURL('image/jpeg');
+    uploadedFiles.value.croppedUrl = dataUrl;
 	}
 
   function enableCropper() {
     const image = imageCrop.value;
-    if(image) {
+    if (image) {
       cropper = new Cropper(image, {
         dragMode: 'move',
         dragCrop: false,
@@ -114,23 +122,24 @@ import Cropper from 'cropperjs';
   })
 
   function uploadImage(e) {
-		user.value.file = e.target.files[0];
+    uploadedFiles.value.file = e.target.files[0];
+		const file = e.target.files[0];
 		const reader = new FileReader();
 		reader.onload = () => {
 			document.querySelector('#image-display').style.backgroundImage = `url(${reader.result})`
 		};
-		reader.readAsDataURL(user.value.file);
+		reader.readAsDataURL(file);
 	}
 
   onMounted(() => {
-    user.value = {
-      fname: fullName.value[0],
-      lname: fullName.value[1],
-      jobTitle: props.currentUser.jobTitle,
-      company: props.currentUser.company,
-      industryOrCategoryOfWork: props.currentUser.industryOrCategoryOfWork,
-      profileImage: props.currentUser.profileImage
-    };
+    // user.value = {
+    //   fname: fullName.value[0],
+    //   lname: fullName.value[1],
+    //   jobTitle: props.currentUser.jobTitle,
+    //   company: props.currentUser.company,
+    //   industryOrCategoryOfWork: props.currentUser.industryOrCategoryOfWork,
+    //   profileImage: props.currentUser.profileImage
+    // };
   });
   
 </script>

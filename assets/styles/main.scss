@@ -99,21 +99,28 @@ ul {
 }
 
 .profile-details { 
-  display: flex;
-  align-items: stretch;
-  padding: 50px 20px 30px;
+  height: 600px;
   position: relative;
 
-  &::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0;
-    height: 30%;
+  .profile-cover {
     width: 100%;
-    background-color: #181818;
-    z-index: -1;
+    height: 54%;
+
+    > div {
+      width: 100%;
+      height: 100%;
+    }
   }
+  // &::before {
+  //   content: "";
+  //   position: absolute;
+  //   left: 0;
+  //   top: 0;
+  //   height: 54%;
+  //   width: 100%;
+  //   background-color: #181818;
+  //   z-index: -1;
+  // }
 
   .edit-profile-link {
     position: absolute;
@@ -139,12 +146,13 @@ ul {
 
   .profile-img {
     flex: 0 0 275px;
-    height: 375px;
+    height: 341px;
 
     img {
       height: 100%;
       width: 100%;
       object-fit: cover;
+      border-radius: 35px 0 0 35px;
     }
   }
 
@@ -152,6 +160,7 @@ ul {
     flex: 1;
     padding: 0 20px;
     background-color: #000;
+    border-radius: 0 35px 35px 0;
     display: flex;
     align-items: center;
 
