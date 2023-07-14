@@ -4,7 +4,7 @@
         <div class="col-md-12">
             <div class="d-flex justify-content-between align-items-center">
                 <h3 class="heading-">Social networks</h3>
-                <nuxt-link to="/profile/edit-social-media">edit</nuxt-link>
+                <nuxt-link v-show="preview" to="/profile/edit-social-media">edit</nuxt-link>
             </div>
         </div>
     </div>
@@ -27,6 +27,10 @@
 
   const props = defineProps({
     currentUser: Object,
+    preview: {
+      type: Boolean,
+      default: true
+    }
   });
 
   const sortSocial = computed(() => {

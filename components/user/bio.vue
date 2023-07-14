@@ -4,7 +4,7 @@
         <div class="col-md-12">
             <div class="d-flex justify-content-between align-items-center">
                 <h3>About</h3>
-                <nuxt-link to="/profile/edit-bio">edit</nuxt-link>
+                <nuxt-link v-show="preview" to="/profile/edit-bio">edit</nuxt-link>
             </div>
         </div>
     </div>
@@ -18,5 +18,9 @@
 <script setup>
   const props = defineProps({
     currentUser: [Array, Object],
+    preview: {
+      type: Boolean,
+      default: true
+    }
   });
 </script>

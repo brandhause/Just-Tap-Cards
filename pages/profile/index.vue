@@ -1,6 +1,15 @@
 <template>
   <div v-if="liveProfile">
-    <div>
+    <div class="position-relative">
+      <div class="position-absolute" style="top: -35px; right: 0">
+        <nuxt-link :to="`/preview/${liveProfile.slug}`" class="d-flex align-items-center text-black px-4 py-1 border rounded" style="gap: 7px">
+          <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+          <small><strong>Public View</strong></small>
+        </nuxt-link>
+      </div>
       <div class="text-center">
         <button
           class="d-flex align-items-center border-0 bg-transparent mx-auto"

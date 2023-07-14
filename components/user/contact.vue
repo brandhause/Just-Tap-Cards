@@ -4,7 +4,7 @@
       <div class="col-md-12">
         <div class="d-flex justify-content-between align-items-center">
           <h3 class="heading-">Contact Info.</h3>
-          <nuxt-link to="/profile/edit-contact-info">edit</nuxt-link>
+          <nuxt-link v-show="preview" to="/profile/edit-contact-info">edit</nuxt-link>
         </div>
       </div>
     </div>
@@ -80,7 +80,11 @@
 </template>
 <script setup>
   const props = defineProps({
-    contactInfo: [Array, Object]
+    contactInfo: [Array, Object],
+    preview: {
+      type: Boolean,
+      default: true
+    }
   })
 
   // function filterProperties(data) {

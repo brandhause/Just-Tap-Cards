@@ -4,7 +4,7 @@
         <div class="col-md-12">
             <div class="d-flex justify-content-between align-items-center">
                 <h3>Video</h3>
-                <nuxt-link to="/profile/edit-video">edit</nuxt-link>
+                <nuxt-link v-show="preview" to="/profile/edit-video">edit</nuxt-link>
             </div>
         </div>
     </div>
@@ -20,10 +20,13 @@
 </template>
 <script setup>
 import Player from '@vimeo/player'
-import { ref, onMounted, onUpdated } from "vue";
 
   const props = defineProps({
     currentUser: [Array, Object],
+    preview: {
+      type: Boolean,
+      default: true
+    }
   });
 
   const playerContainerDiv = ref();
