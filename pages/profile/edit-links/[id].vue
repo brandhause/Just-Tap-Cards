@@ -38,6 +38,10 @@
 import useFirestore from '~/composables/useFirestore.ts';
 import { uploadString, getDownloadURL, ref as storageRef } from "firebase/storage";
 
+  definePageMeta({
+    middleware: ['auth']
+  });
+  
   const { update } = useFirestore();
   const nuxtApp = useNuxtApp();
   const route = useRoute();

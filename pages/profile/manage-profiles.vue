@@ -85,6 +85,10 @@
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, onSnapshot, updateDoc, arrayRemove } from 'firebase/firestore';
 
+  definePageMeta({
+    middleware: ['auth']
+  });
+  
   const nuxtApp = useNuxtApp();
   const currentUser = ref();
 

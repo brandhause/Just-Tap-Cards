@@ -117,6 +117,10 @@
 import { doc, onSnapshot } from 'firebase/firestore';
 import useFirestore from '~/composables/useFirestore.ts';
 
+  definePageMeta({
+    middleware: ['auth']
+  });
+
   const { update } = useFirestore();
   const nuxtApp = useNuxtApp();
   const errCode = ref();
@@ -134,7 +138,7 @@ import useFirestore from '~/composables/useFirestore.ts';
   function refresh() {
     currentUser.value = JSON.parse(localStorage.getItem('profiles'));
     liveProfile.value = JSON.parse(localStorage.getItem('live-profile'));
-
+    
     const contactRef = doc(nuxtApp.$firestore, 'contact_info', liveProfile.value.slug);
 
     onSnapshot(contactRef,
@@ -155,6 +159,7 @@ import useFirestore from '~/composables/useFirestore.ts';
     await nuxtApp.$auth.signOut()
     localStorage.removeItem('profiles')
     localStorage.removeItem('live-profile')
+    return navigateTo('/')
   }
 
   function toggleSwitchProfile() {

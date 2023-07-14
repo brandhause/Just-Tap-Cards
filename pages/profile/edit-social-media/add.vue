@@ -59,6 +59,10 @@
 import { doc, onSnapshot } from "firebase/firestore";
 import useFirestore from '~/composables/useFirestore.ts';
 
+  definePageMeta({
+    middleware: ['auth']
+  });
+  
   const { update } = useFirestore();
   const nuxtApp = useNuxtApp();
   const socialUrl = ref('');

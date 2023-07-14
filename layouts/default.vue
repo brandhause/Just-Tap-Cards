@@ -12,6 +12,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { doc, onSnapshot } from "firebase/firestore";
 
 const nuxtApp = useNuxtApp()
+const route = useRoute()
 
 onBeforeMount(() => {
   onAuthStateChanged(nuxtApp.$auth, (user) => {

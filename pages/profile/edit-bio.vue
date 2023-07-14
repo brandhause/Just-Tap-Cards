@@ -11,6 +11,10 @@
 <script setup>
 import useFirestore from '~/composables/useFirestore.ts';
 
+  definePageMeta({
+    middleware: ['auth']
+  });
+  
   const { update } = useFirestore();
   const liveProfile = ref();
   const currentUser = ref();
