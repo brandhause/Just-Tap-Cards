@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div>
     <div class="row">
       <div class="col-md-12">
         <nuxt-link class="arrow-back" to="/profile/edit-social-media" v-if="!toggleNext">
@@ -56,12 +56,18 @@
   </div>
 </template>
 <script setup>
-import { onAuthStateChanged } from 'firebase/auth';
-import { doc, onSnapshot, updateDoc, arrayUnion } from "firebase/firestore";
+import { doc, onSnapshot } from "firebase/firestore";
+import useFirestore from '~/composables/useFirestore.ts';
 
+  definePageMeta({
+    middleware: ['auth']
+  });
+  
+  const { update } = useFirestore();
   const nuxtApp = useNuxtApp();
   const socialUrl = ref('');
   const searchTxt = ref('');
+  const liveProfile = ref();
   const currentUser = ref();
   const socialNetwork = ref([]);
   const toggleNext = ref(false);
@@ -77,33 +83,14 @@ import { doc, onSnapshot, updateDoc, arrayUnion } from "firebase/firestore";
     })
   })
 
-  onMounted(async () => {
+  onMounted(() => {
+    currentUser.value = JSON.parse(localStorage.getItem('profiles'));
+    liveProfile.value = JSON.parse(localStorage.getItem('live-profile'));
 
-    onAuthStateChanged(nuxtApp.$auth, (user) => {
-      if (!user) {
-        return navigateTo({
-          path: '/'
-        });
-      } else {
-        const docRef = doc(nuxtApp.$firestore, 'users', user.uid);
-        onSnapshot(docRef,
-          (snap) => {
-            currentUser.value = {
-              uid: user.uid,
-              ...snap.data()
-            }
-          },
-          (error) => {
-              //
-          },
-        );
-
-        const socialRef = doc(nuxtApp.$firestore, 'social_network', 'social_doc');
-        onSnapshot(socialRef, (snap) => {
-          socialNetwork.value = snap.data().data;
-        })
-      }
-    });
+    const socialRef = doc(nuxtApp.$firestore, 'social_network', 'social_doc');
+    onSnapshot(socialRef, (snap) => {
+      socialNetwork.value = snap.data().data;
+    })
   })
 
   function nextStep() {
@@ -115,8 +102,8 @@ import { doc, onSnapshot, updateDoc, arrayUnion } from "firebase/firestore";
 
   const maxOrderCount = computed({
     get() {
-      if (!currentUser.value.socialNetwork.length) return;
-      return currentUser.value.socialNetwork.sort((a, b) => b.order - a.order)[0].order;
+      if (!liveProfile.value.socialNetwork.length) return;
+      return liveProfile.value.socialNetwork.sort((a, b) => b.order - a.order)[0].order;
     },
     set(newVal) {
       return newVal
@@ -124,20 +111,21 @@ import { doc, onSnapshot, updateDoc, arrayUnion } from "firebase/firestore";
   })
 
   async function addSocialNetwork() {
-    await updateDoc(doc(nuxtApp.$firestore, 'users', currentUser.value.uid), {
-      socialNetwork: arrayUnion({
-        id: Math.floor(Math.random() * Math.floor(Math.random() * Date.now())), // generate random id
-        socialId: selectedSocial.value.id,
-        socialName: selectedSocial.value.name,
-        socialIcon: selectedSocial.value.icon,
-        url: socialUrl.value,
-        order: maxOrderCount.value ? maxOrderCount.value += 1 : 1
-      }),
+    const profile = currentUser.value.profile;
+    const index = profile.findIndex(item => item.id === liveProfile.value.id);
+    profile[index].socialNetwork.push({
+      id: Math.floor(Math.random() * Math.floor(Math.random() * Date.now())), // generate random id
+      socialId: selectedSocial.value.id,
+      socialName: selectedSocial.value.name,
+      socialIcon: selectedSocial.value.icon,
+      url: socialUrl.value,
+      order: maxOrderCount.value ? maxOrderCount.value += 1 : 1
     })
-    .then(() => {
+
+    const res = await update(currentUser.value.uid, profile);
+    if (res === 'ok') {
       return navigateTo('/profile/edit-social-media');
-    })
-    .catch((err) => console.log(err.message));
+    }
   }
 </script>
 <style lang="scss">

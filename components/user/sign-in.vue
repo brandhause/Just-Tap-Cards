@@ -64,7 +64,11 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
       .catch((err) => {
         errorCode.value = err.message;
       });
-    if (cred) return navigateTo({ path: '/profile' });
+    if (cred) {
+	  setTimeout(() => {
+		  return navigateTo({ path: '/profile' });
+	  }, 1000);
+	}
   };
 </script>
 <style lang="scss">

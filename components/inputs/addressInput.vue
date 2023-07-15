@@ -108,6 +108,7 @@ import draggable from 'vuedraggable';
   function addField() {
     model.value.push({
       id: model.value.length + 1,
+      order: model.value.length + 1 || 1,
       type: 'Location',
       streetLine1: '',
       streetLine2: '',

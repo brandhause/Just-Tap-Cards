@@ -19,7 +19,7 @@ import { doc, onSnapshot } from "firebase/firestore";
     return route.query.signup;
   });
 
-  onMounted(async () => {
+  onMounted(() => {
     onAuthStateChanged(nuxtApp.$auth, (user) => {
       if (user) {
         const docRef = doc(nuxtApp.$firestore, 'users', user.uid);

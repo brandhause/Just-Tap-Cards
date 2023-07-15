@@ -1,4 +1,5 @@
 export default defineNuxtConfig({
+  modules: ['@pinia/nuxt'],
   head: {
     link: [
       {

@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div>
     <form class="row mb-5 justify-content-center" @submit.prevent="submitForm(contact)">
       <div class="col-12">
         <nuxt-link class="arrow-back" to="/profile">
@@ -32,10 +32,15 @@
 </template>
 <script setup>
 import { onAuthStateChanged } from 'firebase/auth';
-import { doc, onSnapshot, updateDoc, arrayUnion } from "firebase/firestore"
+import { doc, onSnapshot, setDoc, arrayUnion } from "firebase/firestore"
 
+  definePageMeta({
+    middleware: ['auth']
+  });
+  
   const phoneType = ref([])
   const addressType = ref([])
+  const liveProfile = ref()
   const currentUser = ref([])
   const nuxtApp = useNuxtApp()
 
@@ -43,7 +48,8 @@ import { doc, onSnapshot, updateDoc, arrayUnion } from "firebase/firestore"
     address: [
       {
         id: 1,
-        type: 1,
+        order: 1,
+        type: 'Location',
         streetLine1: '',
         streetLine2: '',
         city: '',
@@ -53,51 +59,32 @@ import { doc, onSnapshot, updateDoc, arrayUnion } from "firebase/firestore"
       },
     ],
     email: [
-      { id: 1, email: ''},
+      { id: 1, order: 1, email: ''},
     ],
     website: [
-      { id: 1, url: ''},
+      { id: 1, order: 1, url: ''},
     ],
     phone: [
-      { id: 1, type: 1, value: '' },
+      { id: 1, order: 1, type: 1, value: '' },
     ]
   })
 
   onMounted(() => {
+    currentUser.value = JSON.parse(localStorage.getItem('profiles'));
+    liveProfile.value = JSON.parse(localStorage.getItem('live-profile'));
+
     const phoneRef = doc(nuxtApp.$firestore, 'phone', 'data')
     const addressRef = doc(nuxtApp.$firestore, 'address_type', 'data')
+    const contactRef = doc(nuxtApp.$firestore, 'contact_info', liveProfile.value.slug)
 
-    onAuthStateChanged(nuxtApp.$auth, (user) => {
-      if (!user) {
-        return navigateTo({
-          path: '/'
-        });
-      } else {
-        const docRef = doc(nuxtApp.$firestore, 'users', user.uid)
-        const contactRef = doc(nuxtApp.$firestore, 'contact_info', user.uid)
-
-        onSnapshot(docRef,
-          (snap) => {
-            currentUser.value = {
-              uid: user.uid,
-              ...snap.data()
-            }
-          },
-          (error) => {
-            //
-          },
-        );
-
-        onSnapshot(contactRef,
-          (snap) => {
-            contact.value = snap.data()
-          },
-          (error) => {
-            //
-          },
-        );
-      }
-    });
+    onSnapshot(contactRef,
+      (snap) => {
+        contact.value = snap.data() ? snap.data() : contact.value
+      },
+      (error) => {
+        //
+      },
+    );
 
     onSnapshot(phoneRef,
       (snap) => {
@@ -117,9 +104,9 @@ import { doc, onSnapshot, updateDoc, arrayUnion } from "firebase/firestore"
       },
     );
   })
-  
+
   async function submitForm(contact) {
-    const contactRef = doc(nuxtApp.$firestore, 'contact_info', currentUser.value.uid)
-    await updateDoc(contactRef, contact);
+    const contactRef = doc(nuxtApp.$firestore, 'contact_info', liveProfile.value.slug)
+    await setDoc(contactRef, contact, { merge: true });
   }
 </script>
