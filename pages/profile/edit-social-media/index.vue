@@ -40,10 +40,6 @@
 import draggable from 'vuedraggable';
 import { doc, onSnapshot } from "firebase/firestore";
 import useFirestore from '~/composables/useFirestore.ts';
-
-  definePageMeta({
-    middleware: ['auth']
-  });
   
   const { update } = useFirestore();
   const liveProfile = ref();

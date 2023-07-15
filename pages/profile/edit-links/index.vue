@@ -43,10 +43,6 @@
 <script setup>
 import draggable from 'vuedraggable';
 import useFirestore from '~/composables/useFirestore.ts';
-
-  definePageMeta({
-    middleware: ['auth']
-  });
   
   const { update } = useFirestore();
   const drag = ref(false);
