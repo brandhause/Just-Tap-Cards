@@ -75,7 +75,7 @@ import { collection, doc, getDocs, onSnapshot } from "firebase/firestore";
   const contactInfo = ref();
 
   const fullName = computed(() => {
-    if (!liveProfile.value) return [];
+    if (!liveProfile.value && !liveProfile.value.displayName) return [];
     const name = liveProfile.value.displayName.split(' ');
     return name;
   })

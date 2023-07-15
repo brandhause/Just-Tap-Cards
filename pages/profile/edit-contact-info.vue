@@ -33,10 +33,6 @@
 <script setup>
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, onSnapshot, setDoc, arrayUnion } from "firebase/firestore"
-
-  definePageMeta({
-    middleware: ['auth']
-  });
   
   const phoneType = ref([])
   const addressType = ref([])
