@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="profile-details">
-      <div class="profile-cover" style="background: #222222">
+      <div class="profile-cover" style="background: #f5f5f5; height: 54%">
         <div></div>
       </div>
       <div class="position-relative d-flex mx-3" style="background: rgb(41, 41, 41); border-radius: 35px; top: -65px">
@@ -24,51 +24,146 @@
             <input id="uploadProfileImg" type="file" hidden />
           </label>
         </div>
-        <div class="profile-info" style="background: #222222">
-          <h2>
+        <div class="profile-info" :style="{ background: detail.theme.background }">
+          <h2 :style="{ color: detail.theme.color }">
             {{ detail.firstName }}
             <br />
             {{ detail.lastName }}
-            <span class="job-title mt-3">{{ detail.jobTitle }}</span>
-            <span v-if="details.company"> At {{ detail.company }}</span>
+            <span class="job-title mt-3" :style="{ color: detail.theme.altColor }">
+              {{ detail.jobTitle }}
+            </span>
+            <span v-if="details.company" :style="{ color: detail.theme.altColor }">
+              At {{ detail.company }}
+            </span>
           </h2>
         </div>
       </div>
     </div>
-    <div>
+    <div class="mt-5">
       <h4>Change your profile design</h4>
-      <div class="d-flex">
-        <label for="">
-          1
-          <input type="radio" />
+      <div class="color-picker d-flex" style="gap: 0.5rem">
+        <label for="1">
+          <div class="picker-main"></div>
+          <div class="picker-icon" :class="{ checked: themeValue.id === 1 }">
+            <svg v-if="themeValue.id === 1" stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" color="#fff" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg" style="color: #fff">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <p v-else class="mb-0">1</p>
+          </div>
+          <div class="picker-alt"></div>
+          <input
+            type="radio"
+            id="1"
+            value="1"
+            v-model="radioSelect"
+            hidden
+          />
         </label>
-        <label for="">
-          2
-          <input type="radio" />
+        <label for="2">
+          <div class="picker-main" style="background: 0% 0% / cover rgb(35, 81, 164)"></div>
+          <div class="picker-icon" :class="{ checked: themeValue.id === 2 }">
+            <svg v-if="themeValue.id === 2" stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" color="#fff" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg" style="color: #fff">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <p v-else class="mb-0">2</p>
+          </div>
+          <div class="picker-alt" style="background: 0% 0% / cover rgb(16, 52, 116)"></div>
+          <input
+            type="radio"
+            id="2"
+            value="2"
+            v-model="radioSelect"
+            hidden
+          />
         </label>
-        <label for="">
-          3
-          <input type="radio" />
+        <label for="3">
+          <div class="picker-main" style="background: 0% 0% / cover rgb(255, 255, 255)"></div>
+          <div class="picker-icon" :class="{ checked: themeValue.id === 3 }">
+            <svg v-if="themeValue.id === 3" stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" color="#fff" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg" style="color: #fff">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <p v-else class="mb-0">3</p>
+          </div>
+          <div class="picker-alt" style="background: 0% 0% / cover rgb(0, 0, 0)"></div>
+          <input
+            type="radio"
+            id="3"
+            value="3"
+            v-model="radioSelect"
+            hidden
+          />
         </label>
-        <label for="">
-          4
-          <input type="radio" />
+        <label for="4">
+          <div class="picker-main" style="background: linear-gradient(135deg, rgb(217, 220, 202) 0%, rgb(145, 203, 202) 100%) 0% 0% / cover"></div>
+          <div class="picker-icon" :class="{ checked: themeValue.id === 4 }">
+            <svg v-if="themeValue.id === 4" stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" color="#fff" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg" style="color: #fff">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <p v-else class="mb-0">4</p>
+          </div>
+          <div class="picker-alt" style="background: 0% 0% / cover rgb(147, 204, 202)"></div>
+          <input
+            type="radio"
+            id="4"
+            value="4"
+            v-model="radioSelect"
+            hidden
+          />
         </label>
-        <label for="">
-          5
-          <input type="radio" />
+        <label for="5">
+          <div class="picker-main" style="background: linear-gradient(135deg, rgb(255, 92, 36) 10%, rgb(242, 10, 36) 70%, rgb(199, 18, 101) 100%) 0% 0% / cover"></div>
+          <div class="picker-icon" :class="{ checked: themeValue.id === 5 }">
+            <svg v-if="themeValue.id === 5" stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" color="#fff" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg" style="color: #fff">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <p v-else class="mb-0">5</p>
+          </div>
+          <div class="picker-alt" style="background: 0% 0% / cover rgb(113, 13, 107)"></div>
+          <input
+            type="radio"
+            id="5"
+            value="5"
+            v-model="radioSelect"
+            hidden
+          />
         </label>
-        <label for="">
-          6
-          <input type="radio" />
+        <label for="6">
+          <div class="picker-main" style="background: linear-gradient(135deg, rgb(247, 211, 242) 0%, rgb(219, 248, 254) 30%, rgb(198, 223, 251) 100%) 0% 0% / cover"></div>
+          <div class="picker-icon" :class="{ checked: themeValue.id === 6 }">
+            <svg v-if="themeValue.id === 6" stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" color="#fff" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg" style="color: #fff">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <p v-else class="mb-0">6</p>
+          </div>
+          <div class="picker-alt" style="background: 0% 0% / cover rgb(175, 181, 188)"></div>
+          <input
+            type="radio"
+            id="6"
+            value="6"
+            v-model="radioSelect"
+            hidden
+          />
         </label>
-        <label for="">
-          7
-          <input type="radio" />
+        <label for="7">
+          <div class="picker-main" style="background: linear-gradient(135deg, rgb(41, 109, 54) 0%, rgb(62, 176, 68) 100%) 0% 0% / cover"></div>
+          <div class="picker-icon" :class="{ checked: themeValue.id === 7 }">
+            <svg v-if="themeValue.id === 7" stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" color="#fff" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg" style="color: #fff">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <p v-else class="mb-0">7</p>
+          </div>
+          <div class="picker-alt" style="background: 0% 0% / cover rgb(50, 69, 57)"></div>
+          <input
+            type="radio"
+            id="7"
+            value="7"
+            v-model="radioSelect"
+            hidden
+          />
         </label>
       </div>
     </div>
-    <div>
+    <div class="mt-4">
       <div class="py-3">
         <input class="w-100 border-bottom" v-model="detail.firstName" type="text" placeholder="First Name" />
       </div>
@@ -100,9 +195,107 @@
       props.details = newVal;
     }
   })
+  const radioSelect = ref(0)
+  const theme = ref([
+    {
+      id: 1,
+      background: '#010101',
+      color: '#ffffff',
+      altColor: '#a1a1a1'
+    },
+    {
+      id: 2,
+      background: '#2351a4',
+      color: '#ffffff',
+      altColor: '#e3e3e3'
+    },
+    {
+      id: 3,
+      background: '#ffffff',
+      color: '#000000',
+      altColor: '#686868'
+    },
+    {
+      id: 4,
+      background: 'linear-gradient(135deg, rgb(217, 220, 202) 0%, rgb(145, 203, 202) 100%)',
+      color: '#000000',
+      altColor: '#686868'
+    },
+    {
+      id: 5,
+      background: 'linear-gradient(135deg, rgb(255, 92, 36) 10%, rgb(242, 10, 36) 70%, rgb(199, 18, 101) 100%)',
+      color: '#ffffff',
+      altColor: '#ffffff'
+    },
+    {
+      id: 6,
+      background: 'linear-gradient(135deg, rgb(247, 211, 242) 0%, rgb(219, 248, 254) 30%, rgb(198, 223, 251) 100%)',
+      color: '#000000',
+      altColor: '#686868'
+    },
+    {
+      id: 7,
+      background: 'linear-gradient(135deg, rgb(41, 109, 54) 0%, rgb(62, 176, 68) 100%)',
+      color: '#ffffff',
+      altColor: '#e3e3e3'
+    }
+  ])
 
+  const themeValue = computed(() => {
+    if (radioSelect.value == 0) return {};
+    const selected = theme.value.find(t => t.id === +radioSelect.value);
+    detail.value.theme = selected;
+    return selected;
+  })
 </script>
 <style lang="scss" scoped>
+.color-picker {
+  label {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 70px;
+    height: 70px;
+    cursor: pointer;
+
+    .picker-main {
+      position: absolute;
+      clip-path: polygon(100% 0px, 0px 0px, 0px 100%);
+      inset: 0px;
+      background:  0% 0% / cover rgb(1, 1, 1);
+      border-radius: 10px;
+    }
+    .picker-icon {
+      display: flex;
+      position: absolute;
+      -webkit-box-align: center;
+      align-items: center;
+      -webkit-box-pack: center;
+      justify-content: center;
+      box-shadow: 0px 8px 36px rgba(0, 0, 0, 0.05);
+      background: rgb(255, 255, 255);
+      border-radius: 9999px;
+      width: 1.5rem;
+      height: 1.5rem;
+      z-index: 2;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      top: 50%;
+
+      &.checked {
+        background: #ff643a;
+      }
+    }
+    .picker-alt {
+      position: absolute;
+      clip-path: polygon(100% 0px, 100% 100%, 0px 100%);
+      inset: 0px;
+      background:  0% 0% / cover rgb(255, 100, 58);
+      border-radius: 10px;
+    }
+  }
+}
 input,
 textarea {
   resize: none;

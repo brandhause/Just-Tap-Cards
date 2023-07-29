@@ -117,7 +117,8 @@ import { doc, arrayUnion, updateDoc } from 'firebase/firestore';
     lastName: '',
     jobTitle: '',
     company: '',
-    bio: ''
+    bio: '',
+    theme: ''
   })
 
   onUpdated(() => {
