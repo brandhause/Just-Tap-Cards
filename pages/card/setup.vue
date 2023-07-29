@@ -144,6 +144,7 @@ import { doc, arrayUnion, updateDoc, setDoc, onSnapshot } from 'firebase/firesto
     jobTitle: '',
     company: '',
     bio: '',
+    industryOrCategoryOfWork: '',
     theme: ''
   })
   const contact = ref({
@@ -222,6 +223,12 @@ import { doc, arrayUnion, updateDoc, setDoc, onSnapshot } from 'firebase/firesto
     await updateDoc(doc(nuxtApp.$firestore, 'users', currentUser.value.uid), {
       profile: arrayUnion({
         id: currentUser.value.profile.length += 1,
+        displayName: details.value.firstName + ' ' + details.value.lastName,
+        company: details.value.company,
+        jobTitle: details.value.jobTitle,
+        bio: details.value.bio,
+        industryOrCategoryOfWork: details.value.industryOrCategoryOfWork,
+        theme: details.value.theme,
         live: false,
         slug: profileSlug.value,
         profileLinks: [],

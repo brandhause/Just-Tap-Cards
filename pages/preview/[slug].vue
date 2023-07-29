@@ -19,7 +19,7 @@
     </div>
     <div class="profile-container mb-5">
       <div class="profile-wrapper px-3">
-        <div class="profile-cover">
+        <div class="profile-cover" :style="{ '--dynamic-content': liveProfile.theme ? liveProfile.theme.secondary : 'rgb(34, 34, 34)' }">
           <div></div>
         </div>
         <div class="profile-card mx-2">
@@ -32,13 +32,17 @@
                 </svg>
               </span>
             </div>
-            <div class="profile-info">
-              <h2>
+            <div class="profile-info" :style="{ background: liveProfile.theme ? liveProfile.theme.background : '#000000' }">
+              <h2 :style="{ color: liveProfile.theme ? liveProfile.theme.color : '#ffffff' }">
               {{ fullName[0] }}
               <br />
               {{ fullName[1] }}
-              <span class="job-title">{{ liveProfile.jobTitle }}</span>
-              <span v-if="liveProfile.company"> At {{ liveProfile.company }}</span>
+              <span class="job-title" :style="{ color: liveProfile.theme ? liveProfile.theme.altColor : '#c7c7c7' }">
+                {{ liveProfile.jobTitle }}
+              </span>
+              <span v-if="liveProfile.company" :style="{ color: liveProfile.theme ? liveProfile.theme.altColor : '#c7c7c7' }">
+                At {{ liveProfile.company }}
+              </span>
             </h2>
             </div>
           </div>
@@ -98,7 +102,13 @@ import { collection, doc, getDocs, onSnapshot } from "firebase/firestore";
     });
     
     liveProfile.value = profile;
-    
+    if (liveProfile.value) {
+      setTimeout(() => {
+        const d = document.querySelector('div.profile-cover>div')
+        console.log(d)
+      }, 1000);
+      
+    }
     onSnapshot(contactRef,
       (snap) => {
         contactInfo.value = snap.data()
@@ -120,6 +130,7 @@ import { collection, doc, getDocs, onSnapshot } from "firebase/firestore";
     position: relative;
 
     .profile-cover {
+      --dynamic-content: rgb(34, 34, 34);
       height: 120px;
       
       &::after {
@@ -130,7 +141,8 @@ import { collection, doc, getDocs, onSnapshot } from "firebase/firestore";
         z-index: -1;
         left: 0px;
         right: 0px;
-        background: rgb(34, 34, 34);
+        // background: rgb(34, 34, 34);
+        background: var(--dynamic-content);
       }
     }
 
@@ -159,7 +171,8 @@ import { collection, doc, getDocs, onSnapshot } from "firebase/firestore";
         h2 {
           color: #fff;
           font-weight: 700;
-          font-size: 50px;
+          font-size: 45px;
+          line-height: 45px;
           text-transform: capitalize;
           margin: 0;
           display: flex;
@@ -168,6 +181,7 @@ import { collection, doc, getDocs, onSnapshot } from "firebase/firestore";
           span {
             font-weight: 400;
             font-size: 21px;
+            line-height: 23px;
             color: #c7c7c7;
           }
         }
