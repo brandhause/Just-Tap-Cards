@@ -201,43 +201,50 @@
       id: 1,
       background: '#010101',
       color: '#ffffff',
-      altColor: '#a1a1a1'
+      altColor: '#a1a1a1',
+      secondary: '#ff643a'
     },
     {
       id: 2,
       background: '#2351a4',
       color: '#ffffff',
-      altColor: '#e3e3e3'
+      altColor: '#e3e3e3',
+      secondary: '#103474'
     },
     {
       id: 3,
       background: '#ffffff',
       color: '#000000',
-      altColor: '#686868'
+      altColor: '#686868',
+      secondary: '#000000'
     },
     {
       id: 4,
       background: 'linear-gradient(135deg, rgb(217, 220, 202) 0%, rgb(145, 203, 202) 100%)',
       color: '#000000',
-      altColor: '#686868'
+      altColor: '#686868',
+      secondary: '#93ccca'
     },
     {
       id: 5,
       background: 'linear-gradient(135deg, rgb(255, 92, 36) 10%, rgb(242, 10, 36) 70%, rgb(199, 18, 101) 100%)',
       color: '#ffffff',
-      altColor: '#ffffff'
+      altColor: '#ffffff',
+      secondary: '#710d6b'
     },
     {
       id: 6,
       background: 'linear-gradient(135deg, rgb(247, 211, 242) 0%, rgb(219, 248, 254) 30%, rgb(198, 223, 251) 100%)',
       color: '#000000',
-      altColor: '#686868'
+      altColor: '#686868',
+      secondary: '#afb5bc'
     },
     {
       id: 7,
       background: 'linear-gradient(135deg, rgb(41, 109, 54) 0%, rgb(62, 176, 68) 100%)',
       color: '#ffffff',
-      altColor: '#e3e3e3'
+      altColor: '#e3e3e3',
+      secondary: '#324539'
     }
   ])
 

@@ -96,11 +96,35 @@
         <br />
         Add contact information
       </h3>
+      <div>
+        <InputsPhoneInput v-model="contact.phone" :types="phoneType" />
+      </div>
+      <div>
+        <h5>Email</h5>
+        <InputsEmailInput v-model="contact.email" />
+      </div>
+      <div>
+        <h5>Website</h5>
+        <InputsWebsiteInput v-model="contact.website" />
+      </div>
+      <div>
+        <h5>Address</h5>
+        <InputsAddressInput v-model="contact.address" :types="addressType" />
+      </div>
+      <div class="mt-5 mb-4">
+        <button
+          class="d-flex align-items-center text-white w-100 justify-content-center border rounded-3 py-2 px-3"
+          style="font-weight: 900; background: #FF643A"
+          @click="createNewProfile"
+        >
+          <small>Done!</small>
+        </button>
+      </div>
     </div>
   </div>
 </template>
 <script setup>
-import { doc, arrayUnion, updateDoc } from 'firebase/firestore';
+import { doc, arrayUnion, updateDoc, setDoc, onSnapshot } from 'firebase/firestore';
 
   definePageMeta({
     layout: "preview",
@@ -112,6 +136,8 @@ import { doc, arrayUnion, updateDoc } from 'firebase/firestore';
   const step = ref(1)
   const currentUrl = ref()
   const profileSlug = ref()
+  const phoneType = ref([])
+  const addressType = ref([])
   const details = ref({
     firstName: '',
     lastName: '',
@@ -119,6 +145,30 @@ import { doc, arrayUnion, updateDoc } from 'firebase/firestore';
     company: '',
     bio: '',
     theme: ''
+  })
+  const contact = ref({
+    address: [
+      {
+        id: 1,
+        order: 1,
+        type: 'Location',
+        streetLine1: '',
+        streetLine2: '',
+        city: '',
+        state: '',
+        postCode: '',
+        country: '',
+      },
+    ],
+    email: [
+      { id: 1, order: 1, email: ''},
+    ],
+    website: [
+      { id: 1, order: 1, url: ''},
+    ],
+    phone: [
+      { id: 1, order: 1, type: 1, value: '' },
+    ]
   })
 
   onUpdated(() => {
@@ -132,30 +182,27 @@ import { doc, arrayUnion, updateDoc } from 'firebase/firestore';
     currentUser.value = JSON.parse(localStorage.getItem('profiles'));
     liveProfile.value = JSON.parse(localStorage.getItem('live-profile'));
     profileSlug.value = generateRandomSlug();
-    // onAuthStateChanged(nuxtApp.$auth, (user) => {
-    //   if (!user) {
-    //     return navigateTo({
-    //       path: '/'
-    //     });
-    //   } else {
-    //     const docRef = doc(nuxtApp.$firestore, 'users', user.uid);
-        
-    //     onSnapshot(docRef,
-    //       (snap) => {
-    //         currentUser.value = {
-    //           uid: user.uid,
-    //           ...snap.data()
-    //         }
-    //       },
-    //       (error) => {
-    //         //
-    //       },
-    //     );
-    //   }
-    // });
-    // setTimeout(() => {
-    //   createNewProfile()
-    // }, 500);
+
+    const phoneRef = doc(nuxtApp.$firestore, 'phone', 'data')
+    const addressRef = doc(nuxtApp.$firestore, 'address_type', 'data')
+
+    onSnapshot(phoneRef,
+      (snap) => {
+        phoneType.value = snap.data().data
+      },
+      (error) => {
+        //
+      },
+    );
+
+    onSnapshot(addressRef,
+      (snap) => {
+        addressType.value = snap.data().data
+      },
+      (error) => {
+        //
+      },
+    );
   })
 
   function generateRandomSlug() {
@@ -172,9 +219,6 @@ import { doc, arrayUnion, updateDoc } from 'firebase/firestore';
   }
 
   async function createNewProfile() {
-    if (currentUser.value && currentUser.value.profile.length === 3) {
-      return;
-    }
     await updateDoc(doc(nuxtApp.$firestore, 'users', currentUser.value.uid), {
       profile: arrayUnion({
         id: currentUser.value.profile.length += 1,
@@ -183,6 +227,12 @@ import { doc, arrayUnion, updateDoc } from 'firebase/firestore';
         profileLinks: [],
         socialNetwork: [],
       })
+    }).then(async () => {
+      const contactRef = doc(nuxtApp.$firestore, 'contact_info', profileSlug.value)
+      await setDoc(contactRef, contact.value, { merge: true })
+        .then(() => {
+          return navigateTo('/profile');
+        });
     })
   }
 
