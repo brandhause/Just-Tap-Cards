@@ -145,7 +145,8 @@ import { doc, arrayUnion, updateDoc, setDoc, onSnapshot } from 'firebase/firesto
     company: '',
     bio: '',
     industryOrCategoryOfWork: '',
-    theme: ''
+    theme: '',
+    profileImage: ''
   })
   const contact = ref({
     address: [
