@@ -41,7 +41,7 @@
   });
 
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
   .link-items {
     img {
       object-fit: cover;
@@ -49,5 +49,9 @@
       width: 100px;
       margin-right: 30px;
     }
+  }
+
+  a {
+    color: #1a202c;
   }
 </style>

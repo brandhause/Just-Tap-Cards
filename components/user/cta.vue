@@ -92,6 +92,8 @@ button, a {
 
 .cta-btn {
   opacity: 0.9;
+  background: #FF643A;
+  color: #FFFFFF;
   &:hover {
     opacity: 1;
   }
