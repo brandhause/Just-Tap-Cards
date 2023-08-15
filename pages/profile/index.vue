@@ -22,7 +22,7 @@
         </button>
       </div>
       <div class="welcome-text">
-        <h2 v-show="fullName[0]">Hi {{ fullName[0] }}!</h2>
+        <h1 v-show="fullName[0]">Hi {{ fullName[0] }}!</h1>
         <p>This is your profile where you can make changes anytime. Enjoy making new connections!</p>
       </div>
       
@@ -65,23 +65,28 @@
           </div>
         </div>
       </div>
+      <div>
+        <UserCta :currentUser="liveProfile" />
+      </div>
+      <hr />
       <div class="user-bio">
         <UserBio :currentUser="liveProfile" />
       </div>
+      <hr />
       <div class="social-media">
         <UserSocialMedia :currentUser="liveProfile" />
       </div>
+      <hr />
       <div class="links">
         <UserLinks :currentUser="liveProfile" />
       </div>
+      <hr />
       <div class="video">
         <UserVideo :currentUser="liveProfile" />
       </div>
+      <hr />
       <div class="contact">
         <UserContact :currentUser="liveProfile" :contactInfo="contactInfo" />
-      </div>
-      <div>
-        <button @click="logout">Logout</button>
       </div>
     </div>
     <Modal radius="8px 8px 0 0" align="end" v-if="modal" @closeModal="closeSwitchProfile">
@@ -208,3 +213,14 @@ import useFirestore from '~/composables/useFirestore.ts';
     // }).catch((err) => errCode.value = err.message);
   }
 </script>
+<style lang="scss" scoped>
+hr {
+  border-width: 6px;
+  border-image: initial;
+  border-color: inherit;
+  border-style: solid;
+  width: 100%;
+  opacity: 0.6;
+  color: #f5f5f5;
+}
+</style>

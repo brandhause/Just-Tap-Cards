@@ -1,6 +1,12 @@
 @import "bootstrap/scss/bootstrap";
 @import "cropper/croppercss";
 
+$primary: #FF643A;
+
+.text-accent {
+  color: $primary;
+}
+
 *,
 body {
   font-family: 'poppins', sans-serif;
@@ -10,8 +16,12 @@ body {
 
 a {
   text-transform: capitalize;
-  color: #27AAE1;
+  color: $primary;
   text-decoration: none;
+
+  &:hover {
+    color: $primary;
+  }
 }
 
 img {
@@ -187,9 +197,10 @@ ul {
 }
 
 .welcome-text {
-  h2 {
-    font-size: 38px;
+  h1 {
+    font-size: 30px;
     font-weight: 700;
+    line-height: 1.2;
   }
 }
 .highlight {
