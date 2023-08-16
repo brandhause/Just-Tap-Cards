@@ -42,9 +42,11 @@
 
 <script setup>
 import draggable from 'vuedraggable';
+import { ref as storageRef, deleteObject } from 'firebase/storage';
 import useFirestore from '~/composables/useFirestore.ts';
   
   const { update } = useFirestore();
+  const nuxtApp = useNuxtApp();
   const drag = ref(false);
   const liveProfile = ref();
   const currentUser = ref();
@@ -104,6 +106,8 @@ import useFirestore from '~/composables/useFirestore.ts';
 
     const res = await update(currentUser.value.uid, profile);
     if (res === 'ok') {
+      const imgRef = storageRef(nuxtApp.$storage, link.linkThumbnail);
+      deleteObject(imgRef).catch((err) => console.log(err));
       refresh();
     }
   }

@@ -112,7 +112,7 @@
   }
 </script>
 <style lang="scss" scoped>
-.contact {
+ul {
   a {
     color: #1a202c;
   }

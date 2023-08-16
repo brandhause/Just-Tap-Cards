@@ -104,6 +104,7 @@
 <script setup>
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, onSnapshot, updateDoc, deleteDoc, arrayRemove } from 'firebase/firestore';
+import { ref as storageRef, deleteObject } from 'firebase/storage';
 import useFirestore from '~/composables/useFirestore.ts';
 
   const { update } = useFirestore();  
@@ -146,6 +147,14 @@ import useFirestore from '~/composables/useFirestore.ts';
         const contactRef = doc(nuxtApp.$firestore, 'contact_info', profile.slug)
         await deleteDoc(contactRef)
           .then(() => {
+            // delete profile image if any
+            if (profile.profileImage) {
+              const imgRef = storageRef(nuxtApp.$storage, profile.profileImage);
+              deleteObject(imgRef)
+                .catch((err) => {
+                  console.log(err)
+                });
+            }
             return navigateTo('/profile');
           });
       })

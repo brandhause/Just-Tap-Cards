@@ -43,15 +43,14 @@
 </script>
 <style lang="scss" scoped>
   .link-items {
+    a {
+      color: #1a202c;
+    }
     img {
       object-fit: cover;
       height: auto;
       width: 100px;
       margin-right: 30px;
     }
-  }
-
-  a {
-    color: #1a202c;
   }
 </style>
