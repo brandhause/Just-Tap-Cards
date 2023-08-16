@@ -173,19 +173,21 @@
       </div>
     </div>
     <div class="mt-4">
-      <div class="py-3">
-        <input class="w-100 border-bottom" v-model="detail.firstName" type="text" placeholder="First Name" />
+      <div style="height: 80px">
+        <input class="w-100 border-bottom" v-model="detail.firstName" @blur="validate" @keyup="validate" type="text" placeholder="First Name" />
+        <small>Field is required.</small>
       </div>
-      <div class="py-3">
-        <input class="w-100 border-bottom" v-model="detail.lastName" type="text" placeholder="Last Name" />
+      <div style="height: 80px">
+        <input class="w-100 border-bottom" v-model="detail.lastName" @blur="validate" @keyup="validate" type="text" placeholder="Last Name" />
+        <small>Field is required.</small>
       </div>
-      <div class="py-3">
+      <div style="height: 80px">
         <input class="w-100 border-bottom" v-model="detail.jobTitle" type="text" placeholder="Job title" />
       </div>
-      <div class="py-3">
+      <div style="height: 80px">
         <input class="w-100 border-bottom" v-model="detail.company" type="text" placeholder="Company" />
       </div>
-      <div class="py-3">
+      <div>
         <textarea v-model="detail.bio" class="w-100 border-bottom" placeholder="Bio" />
       </div>
     </div>
@@ -271,11 +273,20 @@ import Cropper from 'cropperjs';
     return selected;
   })
 
+  function validate(e) {
+    const value = e.target.value;
+    if (!value) {
+      e.target.classList.add('invalid');
+    } else {
+      e.target.classList.remove('invalid');
+    }
+  }
+
   function uploadProfile(e) {
 		const file = e.target.files[0];
     uploadedFiles.value.file = file;
     detail.value.cropped.file = file;
-    
+
 		const reader = new FileReader();
 		reader.onload = () => {
       imageCrop.value.src = reader.result;
@@ -392,6 +403,23 @@ textarea {
     border-color: #FF643A !important;
     &::placeholder {
       color: #FF643A;
+    }
+  }
+
+  ~ small {
+    display: none;
+    color: red;
+  }
+
+  &.invalid {
+    border-color: red !important;
+
+    // &::placeholder {
+    //   color: red;
+    // }
+
+    ~ small {
+      display: block;
     }
   }
 }

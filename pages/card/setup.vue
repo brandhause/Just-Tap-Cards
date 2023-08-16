@@ -222,37 +222,64 @@ import { uploadString, getDownloadURL, ref as storageRef } from "firebase/storag
   }
 
   async function createNewProfile() {
-    const imgRef = storageRef(nuxtApp.$storage, `images/${currentUser.value.uid}/${details.value.cropped.file.name}`);
-    // upload cropped url
-    uploadString(imgRef, details.value.cropped.url, 'data_url').then(() => {
-      // download url from firebase
-      getDownloadURL(imgRef).then(async (url) => {
-        // update profile document
-        await updateDoc(doc(nuxtApp.$firestore, 'users', currentUser.value.uid), {
-          profile: arrayUnion({
-            id: currentUser.value.profile.length += 1,
-            displayName: details.value.firstName + ' ' + details.value.lastName,
-            profileImage: url,
-            company: details.value.company,
-            jobTitle: details.value.jobTitle,
-            bio: details.value.bio,
-            industryOrCategoryOfWork: details.value.industryOrCategoryOfWork,
-            theme: details.value.theme,
-            live: false,
-            slug: profileSlug.value,
-            profileLinks: [],
-            socialNetwork: [],
+    if (!details.value.cropped.file) {
+      updateProfile();
+    } else {
+      const imgRef = storageRef(nuxtApp.$storage, `images/${currentUser.value.uid}/${details.value.cropped.file.name}`);
+      // upload cropped url
+      uploadString(imgRef, details.value.cropped.url, 'data_url').then(() => {
+        // download url from firebase
+        getDownloadURL(imgRef).then(async (url) => {
+          // update profile document
+          await updateDoc(doc(nuxtApp.$firestore, 'users', currentUser.value.uid), {
+            profile: arrayUnion({
+              id: currentUser.value.profile.length += 1,
+              displayName: details.value.firstName + ' ' + details.value.lastName,
+              profileImage: url,
+              company: details.value.company,
+              jobTitle: details.value.jobTitle,
+              bio: details.value.bio,
+              industryOrCategoryOfWork: details.value.industryOrCategoryOfWork,
+              theme: details.value.theme,
+              live: false,
+              slug: profileSlug.value,
+              profileLinks: [],
+              socialNetwork: [],
+            })
+          }).then(async () => {
+            const contactRef = doc(nuxtApp.$firestore, 'contact_info', profileSlug.value)
+            await setDoc(contactRef, contact.value, { merge: true })
+              .then(() => {
+                return navigateTo('/profile');
+              });
           })
-        }).then(async () => {
-          const contactRef = doc(nuxtApp.$firestore, 'contact_info', profileSlug.value)
-          await setDoc(contactRef, contact.value, { merge: true })
-            .then(() => {
-              return navigateTo('/profile');
-            });
         })
       })
+    }
+  }
+
+  async function updateProfile() {
+    await updateDoc(doc(nuxtApp.$firestore, 'users', currentUser.value.uid), {
+      profile: arrayUnion({
+        id: currentUser.value.profile.length += 1,
+        displayName: details.value.firstName + ' ' + details.value.lastName,
+        company: details.value.company,
+        jobTitle: details.value.jobTitle,
+        bio: details.value.bio,
+        industryOrCategoryOfWork: details.value.industryOrCategoryOfWork,
+        theme: details.value.theme,
+        live: false,
+        slug: profileSlug.value,
+        profileLinks: [],
+        socialNetwork: [],
+      })
+    }).then(async () => {
+      const contactRef = doc(nuxtApp.$firestore, 'contact_info', profileSlug.value)
+      await setDoc(contactRef, contact.value, { merge: true })
+        .then(() => {
+          return navigateTo('/profile');
+        });
     })
-    
   }
 
   function toggleNextStep() {
