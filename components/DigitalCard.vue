@@ -5,16 +5,18 @@
         <div></div>
       </div>
       <div class="position-relative d-flex mx-3" style="background: rgb(41, 41, 41); border-radius: 35px; top: -65px">
-        <div class="position-relative" style="flex: 0 0 275px">
-          <div class="profile-img mx-auto d-flex">
-            <img id="imageCrop" ref="imageCrop" :src="uploadedFiles.croppedUrl" crossorigin />
-            <span class="w-100 mt-auto">
-              <svg width="100%" height="227.33333333333331" viewBox="0 0 122 160" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path opacity="0.4" d="M61.0005 79C79.2248 79 94 61.3154 94 39.5002C94 17.6846 89.1491 0 61.0005 0C32.8518 0 28 17.6846 28 39.5002C28 61.3154 42.7752 79 61.0005 79Z" fill="#686868"></path><path opacity="0.4" d="M121.932 138.151C121.334 99.8308 116.405 88.9117 78.6861 82C78.6861 82 73.3766 88.8694 61.0014 88.8694C48.6261 88.8694 43.3157 82 43.3157 82C6.00888 88.8363 0.7801 99.5934 0.0925852 136.906C0.036209 139.953 0.0100836 140.113 0 139.759C0.00229172 140.422 0.0925852 160 0.0925852 160H61H122C122 160 121.999 141.457 122 140.807C121.99 141.026 121.97 140.602 121.932 138.151Z" fill="#686868"></path>
-              </svg>
-            </span>
+        <div class="position-relative" style="flex: 0 0 275px; z-index: 1">
+          <div class="profile-img position-relative mx-auto d-flex">
+            <img id="imageCrop" ref="imageCrop" :src="uploadedFiles.croppedUrl || ''" crossorigin />
+            <div class="d-flex position-absolute w-100 h-100" style="top: 0; left: 0; z-index: -1; pointer-events: none">
+              <span class="w-100 mt-auto">
+                <svg width="100%" height="227.33333333333331" viewBox="0 0 122 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path opacity="0.4" d="M61.0005 79C79.2248 79 94 61.3154 94 39.5002C94 17.6846 89.1491 0 61.0005 0C32.8518 0 28 17.6846 28 39.5002C28 61.3154 42.7752 79 61.0005 79Z" fill="#686868"></path><path opacity="0.4" d="M121.932 138.151C121.334 99.8308 116.405 88.9117 78.6861 82C78.6861 82 73.3766 88.8694 61.0014 88.8694C48.6261 88.8694 43.3157 82 43.3157 82C6.00888 88.8363 0.7801 99.5934 0.0925852 136.906C0.036209 139.953 0.0100836 140.113 0 139.759C0.00229172 140.422 0.0925852 160 0.0925852 160H61H122C122 160 121.999 141.457 122 140.807C121.99 141.026 121.97 140.602 121.932 138.151Z" fill="#686868"></path>
+                </svg>
+              </span>
+            </div>
           </div>
-          <label for="uploadProfileImg" class="camera-icon position-absolute">
+          <label for="uploadProfileImg" class="camera-icon position-absolute" style="z-index: 1">
             <span class="d-flex justify-content-center align-items-center">
               <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" color="var(--chakra-colors-contrast)" height="24" width="24" xmlns="http://www.w3.org/2000/svg" style="color: var(--chakra-colors-contrast);">
                 <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
@@ -23,7 +25,7 @@
             </span>
             <input id="uploadProfileImg" type="file" accept="image/jpeg, image/jpg, image/png" @change="uploadProfile" hidden />
           </label>
-          <button v-if="uploadedFiles.file" class="camera-icon position-absolute" @click="cropImage">
+          <button v-if="uploadedFiles.file" class="camera-icon position-absolute" style="z-index: 1" @click="cropImage">
             <span class="d-flex justify-content-center align-items-center">
               <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" color="#fff" height="24" width="24" xmlns="http://www.w3.org/2000/svg" style="color: #fff">
                 <polyline points="20 6 9 17 4 12"></polyline>
@@ -272,7 +274,8 @@ import Cropper from 'cropperjs';
   function uploadProfile(e) {
 		const file = e.target.files[0];
     uploadedFiles.value.file = file;
-
+    detail.value.cropped.file = file;
+    
 		const reader = new FileReader();
 		reader.onload = () => {
       imageCrop.value.src = reader.result;
@@ -286,31 +289,14 @@ import Cropper from 'cropperjs';
       return;
     }
 		const canvas = cropper.getCroppedCanvas();
-		const roundedCanvas = getRoundedCanvas(canvas);
 
     const dataUrl = canvas.toDataURL('image/jpeg');
     uploadedFiles.value.croppedUrl = dataUrl;
+    detail.value.cropped.url = dataUrl;
     cropper.destroy();
     document.querySelector('#uploadProfileImg').value = ''
     uploadedFiles.value.file = ''
 	}
-
-  function getRoundedCanvas(sourceCanvas) {
-    var canvas = document.createElement('canvas');
-    var context = canvas.getContext('2d');
-    var width = sourceCanvas.width;
-    var height = sourceCanvas.height;
-
-    canvas.width = width;
-    canvas.height = height;
-    context.imageSmoothingEnabled = true;
-    context.drawImage(sourceCanvas, 0, 0, width, height);
-    context.globalCompositeOperation = 'destination-in';
-    context.beginPath();
-    context.arc(width / 2, height / 2, Math.min(width, height) / 2, 0, 2 * Math.PI, true);
-    context.fill();
-    return canvas;
-  }
 
   function enableCropper() {
     const image = imageCrop.value;
@@ -319,7 +305,7 @@ import Cropper from 'cropperjs';
         dragMode: 'move',
         dragCrop: false,
         zoomable: true,
-        minContainerWidth: 300,
+        minContainerWidth: 275,
         minContainerHeight: 300,
         minCropBoxWidth: 500,
         minCropBoxHeight: 500,
@@ -337,12 +323,6 @@ import Cropper from 'cropperjs';
         ready: function () {
           croppable = true;
         },
-        crop(event) {
-          console.log(event.detail.x)
-          console.log(event.detail.y)
-          console.log(event.detail.width)
-          console.log(event.detail.height)
-        }
       })
     }else {
       console.log('please upload a file');
@@ -350,6 +330,9 @@ import Cropper from 'cropperjs';
 	}
 </script>
 <style lang="scss" scoped>
+#imageCrop[src=''] {
+  display: none;
+}
 .color-picker {
   label {
     position: relative;
