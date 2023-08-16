@@ -21,8 +21,8 @@
         >
           <template #item="{ element }">
             <li class="list-group-item d-flex">
-              <div>
-                <img :src="element.linkThumbnail" alt="">
+              <div class="d-flex" style="height: 4rem; width: 4rem">
+                <img :src="element.linkThumbnail" alt="" class="rounded" >
               </div>
               <div class="d-flex flex-column">
                 <!-- <strong>{{ matchSocial('name', element) }}</strong> -->

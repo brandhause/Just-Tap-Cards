@@ -14,9 +14,11 @@
                 <li class="link-item mb-4" v-for="link in sortLinks" :key="`link-${link.id}`">
                     <a :href="link.url" target="_blank">
                         <div>
-                            <a class="d-flex align-items-center" :href="link.linkURL" target="_blank">
-                              <img :src="link.linkThumbnail" :alt="link.linkThumbnail" />
-                              <p>{{ link.linktext }}</p>
+                            <a class="d-flex align-items-center" style="gap: 30px" :href="link.linkURL" target="_blank">
+                              <div class="d-flex" style="height: 4rem; width: 4rem">
+                                <img class="rounded" :src="link.linkThumbnail" :alt="link.linkThumbnail" />
+                              </div>
+                              <p class="m-0">{{ link.linktext }}</p>
                             </a>
                         </div>
                     </a>
@@ -49,8 +51,6 @@
     img {
       object-fit: cover;
       height: auto;
-      width: 100px;
-      margin-right: 30px;
     }
   }
 </style>
