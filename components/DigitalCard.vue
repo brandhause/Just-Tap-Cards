@@ -7,7 +7,7 @@
       <div class="position-relative d-flex mx-3" style="background: rgb(41, 41, 41); border-radius: 35px; top: -65px">
         <div class="position-relative" style="flex: 0 0 275px; z-index: 1">
           <div class="profile-img position-relative mx-auto d-flex">
-            <img id="imageCrop" ref="imageCrop" :src="uploadedFiles.croppedUrl || ''" crossorigin />
+            <img id="imageCrop" ref="imageCrop" :src="uploadedFiles.croppedUrl || detail.cropped.url || ''" crossorigin />
             <div class="d-flex position-absolute w-100 h-100" style="top: 0; left: 0; z-index: -1; pointer-events: none">
               <span class="w-100 mt-auto">
                 <svg width="100%" height="227.33333333333331" viewBox="0 0 122 160" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -187,7 +187,10 @@
       <div style="height: 80px">
         <input class="w-100 border-bottom" v-model="detail.company" type="text" placeholder="Company" />
       </div>
-      <div>
+      <div style="height: 80px">
+        <input class="w-100 border-bottom" v-model="detail.industryOrCategoryOfWork" type="text" placeholder="Industry or Category of work" />
+      </div>
+      <div v-show="!edit">
         <textarea v-model="detail.bio" class="w-100 border-bottom" placeholder="Bio" />
       </div>
     </div>
@@ -197,7 +200,11 @@
 import Cropper from 'cropperjs';
 
   const props = defineProps({
-    details: Object
+    details: Object,
+    edit: {
+      type: Boolean,
+      default: false
+    }
   })
 
   const uploadedFiles = ref({});
@@ -213,7 +220,7 @@ import Cropper from 'cropperjs';
       props.details = newVal;
     }
   })
-  const radioSelect = ref(0)
+  const radioSelect = ref(props.details.theme.id || 0)
   const theme = ref([
     {
       id: 1,
@@ -414,9 +421,9 @@ textarea {
   &.invalid {
     border-color: red !important;
 
-    // &::placeholder {
-    //   color: red;
-    // }
+    &::placeholder {
+      color: red;
+    }
 
     ~ small {
       display: block;
