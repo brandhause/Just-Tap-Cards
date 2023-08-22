@@ -1,10 +1,11 @@
 @import "bootstrap/scss/bootstrap";
 @import "cropper/croppercss";
 
-$primary: #FF643A;
+$primary: #1a202c;
+$accent: #FF643A;
 
 .text-accent {
-  color: $primary;
+  color: $accent;
 }
 
 *,
@@ -16,11 +17,11 @@ body {
 
 a {
   text-transform: capitalize;
-  color: $primary;
+  color: $accent;
   text-decoration: none;
 
   &:hover {
-    color: $primary;
+    color: $accent;
   }
 }
 

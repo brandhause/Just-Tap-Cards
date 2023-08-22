@@ -1,5 +1,5 @@
 <template>
-  <div class="alert-modal" :class="state">
+  <div class="alert-modal" v-if="state" :class="state">
     <div class="alert-body d-flex px-3 py-3 rounded" style="gap: 16px">
       <span>
         <svg fill="#fff" width="24" height="24" clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
