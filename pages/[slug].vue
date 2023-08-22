@@ -1,22 +1,5 @@
 <template>
   <div class="position-relative" v-if="liveProfile">
-    <div class="header-btn d-flex justify-content-between align-items-center">
-      <span class="d-flex align-items-center" style="gap: 7px">
-        <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
-          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-          <circle cx="12" cy="12" r="3"></circle>
-        </svg>
-        Public view
-      </span>
-      <div>
-        <nuxt-link to="/profile" class="text-black border rounded py-1 px-5 d-flex align-items-center" style="gap: 5px">
-          <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
-            <path d="M186.301 339.893L96 249.461l-32 30.507L186.301 402 448 140.506 416 110z"></path>
-          </svg>
-          <small><strong>Done</strong></small>
-        </nuxt-link>
-      </div>
-    </div>
     <div class="profile-container mb-5">
       <div class="profile-wrapper px-3">
         <div class="profile-cover" :style="{ '--dynamic-content': liveProfile.theme ? liveProfile.theme.secondary : 'rgb(34, 34, 34)' }">
@@ -25,7 +8,7 @@
         <div class="profile-card mx-2">
           <div class="d-flex">
             <div class="profile-img d-flex" style="background: rgb(41, 41, 41); border-radius: 26.4px 0 0 26.4px">
-              <img v-if="false" src="" alt="" />
+              <img v-if="liveProfile.profileImage" :src="liveProfile.profileImage" />
               <span v-else class="d-flex mt-auto w-100">
                 <svg width="100%" height="227.33333333333331" viewBox="0 0 122 160" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path opacity="0.4" d="M61.0005 79C79.2248 79 94 61.3154 94 39.5002C94 17.6846 89.1491 0 61.0005 0C32.8518 0 28 17.6846 28 39.5002C28 61.3154 42.7752 79 61.0005 79Z" fill="#686868"></path><path opacity="0.4" d="M121.932 138.151C121.334 99.8308 116.405 88.9117 78.6861 82C78.6861 82 73.3766 88.8694 61.0014 88.8694C48.6261 88.8694 43.3157 82 43.3157 82C6.00888 88.8363 0.7801 99.5934 0.0925852 136.906C0.036209 139.953 0.0100836 140.113 0 139.759C0.00229172 140.422 0.0925852 160 0.0925852 160H61H122C122 160 121.999 141.457 122 140.807C121.99 141.026 121.97 140.602 121.932 138.151Z" fill="#686868"></path>
@@ -34,16 +17,16 @@
             </div>
             <div class="profile-info" :style="{ background: liveProfile.theme ? liveProfile.theme.background : '#000000' }">
               <h2 :style="{ color: liveProfile.theme ? liveProfile.theme.color : '#ffffff' }">
-              {{ fullName[0] }}
-              <br />
-              {{ fullName[1] }}
-              <span class="job-title" :style="{ color: liveProfile.theme ? liveProfile.theme.altColor : '#c7c7c7' }">
-                {{ liveProfile.jobTitle }}
-              </span>
-              <span v-if="liveProfile.company" :style="{ color: liveProfile.theme ? liveProfile.theme.altColor : '#c7c7c7' }">
-                At {{ liveProfile.company }}
-              </span>
-            </h2>
+                {{ fullName[0] }}
+                <br />
+                {{ fullName[1] }}
+                <span class="job-title" :style="{ color: liveProfile.theme ? liveProfile.theme.altColor : '#c7c7c7' }">
+                  {{ liveProfile.jobTitle }}
+                </span>
+                <span v-if="liveProfile.company" :style="{ color: liveProfile.theme ? liveProfile.theme.altColor : '#c7c7c7' }">
+                  At {{ liveProfile.company }}
+                </span>
+              </h2>
             </div>
           </div>
         </div>
@@ -102,13 +85,7 @@ import { collection, doc, getDocs, onSnapshot } from "firebase/firestore";
     });
     
     liveProfile.value = profile;
-    if (liveProfile.value) {
-      setTimeout(() => {
-        const d = document.querySelector('div.profile-cover>div')
-        console.log(d)
-      }, 1000);
-      
-    }
+    
     onSnapshot(contactRef,
       (snap) => {
         contactInfo.value = snap.data()

@@ -21,8 +21,8 @@
         >
           <template #item="{ element }">
             <li class="list-group-item d-flex">
-              <div>
-                <img :src="element.linkThumbnail" alt="">
+              <div class="d-flex" style="height: 4rem; width: 4rem">
+                <img :src="element.linkThumbnail" alt="" class="rounded" >
               </div>
               <div class="d-flex flex-column">
                 <!-- <strong>{{ matchSocial('name', element) }}</strong> -->
@@ -42,9 +42,11 @@
 
 <script setup>
 import draggable from 'vuedraggable';
+import { ref as storageRef, deleteObject } from 'firebase/storage';
 import useFirestore from '~/composables/useFirestore.ts';
   
   const { update } = useFirestore();
+  const nuxtApp = useNuxtApp();
   const drag = ref(false);
   const liveProfile = ref();
   const currentUser = ref();
@@ -104,6 +106,8 @@ import useFirestore from '~/composables/useFirestore.ts';
 
     const res = await update(currentUser.value.uid, profile);
     if (res === 'ok') {
+      const imgRef = storageRef(nuxtApp.$storage, link.linkThumbnail);
+      deleteObject(imgRef).catch((err) => console.log(err));
       refresh();
     }
   }

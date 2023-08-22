@@ -1,6 +1,12 @@
 @import "bootstrap/scss/bootstrap";
 @import "cropper/croppercss";
 
+$primary: #FF643A;
+
+.text-accent {
+  color: $primary;
+}
+
 *,
 body {
   font-family: 'poppins', sans-serif;
@@ -10,8 +16,12 @@ body {
 
 a {
   text-transform: capitalize;
-  color: #27AAE1;
+  color: $primary;
   text-decoration: none;
+
+  &:hover {
+    color: $primary;
+  }
 }
 
 img {
@@ -105,7 +115,7 @@ ul {
   .profile-cover {
     width: 100%;
     // height: 54%;
-    height: 20%;
+    height: 54%;
 
     > div {
       width: 100%;
@@ -169,7 +179,8 @@ ul {
     h2 {
       color: #fff;
       font-weight: 700;
-      font-size: 50px;
+      font-size: 45px;
+      line-height: 45px;
       text-transform: capitalize;
       margin: 0;
       display: flex;
@@ -178,6 +189,7 @@ ul {
       span {
         font-weight: 400;
         font-size: 21px;
+        line-height: 23px;
         color: #c7c7c7;
       }
     }
@@ -185,9 +197,10 @@ ul {
 }
 
 .welcome-text {
-  h2 {
-    font-size: 38px;
+  h1 {
+    font-size: 30px;
     font-weight: 700;
+    line-height: 1.2;
   }
 }
 .highlight {

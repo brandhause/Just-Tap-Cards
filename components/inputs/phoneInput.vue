@@ -30,10 +30,11 @@
               <button @click.prevent="deleteField(index)">Delete X</button>
             </div>
             <div class="d-flex">
-              <select class="form-control w-50" v-model="element.type">
+              <select :style="{ color: element.type !== 1 ? '#212529' : '#a1a1a1'}" class="form-control w-50" v-model="element.type">
                 <option :value="type.name" v-for="type in types" :key="type.id">
                   {{ type.name }}
                 </option>
+                <option :value="element.type" selected hidden>Phone</option>
               </select>
               <input class="form-control" type="text" v-model="element.value" />
             </div>

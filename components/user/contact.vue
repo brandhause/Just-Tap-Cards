@@ -111,3 +111,10 @@
     return Object.keys(filteredObj).length > 0;
   }
 </script>
+<style lang="scss" scoped>
+ul {
+  a {
+    color: #1a202c;
+  }
+}
+</style>

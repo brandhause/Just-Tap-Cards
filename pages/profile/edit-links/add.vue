@@ -14,7 +14,7 @@
         <label for="file-upload" class="custom-file-upload">
             Custom Upload
         </label>
-        <input id="file-upload" @change="addImage" type="file"/>
+        <input id="file-upload" @change="addImage" type="file" accept="image/jpg, image/jpeg, image/png" />
         <button
           class="next-btn border-0 px-5 py-2 rounded"
           :class="{ 'disabled': !linkURL || !croppedImage || !textLink }"
@@ -79,6 +79,10 @@ import useFirestore from '~/composables/useFirestore.ts';
   }
 
   const closeModal = () => {
+    const el = document.querySelector('#file-upload');
+    el.value = ''
+    imageUploadFile.value = ''
+    imageFile.value = ''
     isOpen.value = false;
   };
 

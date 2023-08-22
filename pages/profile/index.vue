@@ -22,7 +22,7 @@
         </button>
       </div>
       <div class="welcome-text">
-        <h2 v-show="fullName[0]">Hi {{ fullName[0] }}!</h2>
+        <h1 v-show="fullName[0]">Hi {{ fullName[0] }}!</h1>
         <p>This is your profile where you can make changes anytime. Enjoy making new connections!</p>
       </div>
       
@@ -32,7 +32,10 @@
             <path d="M471.6 21.7c-21.9-21.9-57.3-21.9-79.2 0L362.3 51.7l97.9 97.9 30.1-30.1c21.9-21.9 21.9-57.3 0-79.2L471.6 21.7zm-299.2 220c-6.1 6.1-10.8 13.6-13.5 21.9l-29.6 88.8c-2.9 8.6-.6 18.1 5.8 24.6s15.9 8.7 24.6 5.8l88.8-29.6c8.2-2.8 15.7-7.4 21.9-13.5L437.7 172.3 339.7 74.3 172.4 241.7zM96 64C43 64 0 107 0 160V416c0 53 43 96 96 96H352c53 0 96-43 96-96V320c0-17.7-14.3-32-32-32s-32 14.3-32 32v96c0 17.7-14.3 32-32 32H96c-17.7 0-32-14.3-32-32V160c0-17.7 14.3-32 32-32h96c17.7 0 32-14.3 32-32s-14.3-32-32-32H96z" />
           </svg>
         </nuxt-link>
-        <div class="profile-cover" style="background: rgb(34, 34, 34)">
+        <div
+          class="profile-cover"
+          :style="{ background: liveProfile.theme ? liveProfile.theme.secondary : 'rgb(34, 34, 34)' }"
+        >
           <div></div>
         </div>
         <div class="position-relative d-flex mx-3" style="background: rgb(41, 41, 41); border-radius: 35px; top: -65px">
@@ -44,34 +47,46 @@
               </svg>
             </span>
           </div>
-          <div class="profile-info">
-            <h2>
+          <div
+            class="profile-info"
+            :style="{ background: liveProfile.theme ? liveProfile.theme.background : '#000000' }"
+          >
+            <h2 :style="{ color: liveProfile.theme ? liveProfile.theme.color : '#ffffff' }">
               {{ fullName[0] }}
               <br />
               {{ fullName[1] }}
-              <span class="job-title">{{ liveProfile.jobTitle }}</span>
-              <span v-if="liveProfile.company"> At {{ liveProfile.company }}</span>
+              <span class="job-title" :style="{ color: liveProfile.theme ? liveProfile.theme.altColor : '#ffffff' }">
+                {{ liveProfile.jobTitle }}
+              </span>
+              <span v-if="liveProfile.company" :style="{ color: liveProfile.theme ? liveProfile.theme.altColor : '#ffffff' }">
+                At {{ liveProfile.company }}
+              </span>
             </h2>
           </div>
         </div>
       </div>
+      <div>
+        <UserCta :currentUser="liveProfile" />
+      </div>
+      <hr />
       <div class="user-bio">
         <UserBio :currentUser="liveProfile" />
       </div>
+      <hr />
       <div class="social-media">
         <UserSocialMedia :currentUser="liveProfile" />
       </div>
+      <hr />
       <div class="links">
         <UserLinks :currentUser="liveProfile" />
       </div>
+      <hr />
       <div class="video">
         <UserVideo :currentUser="liveProfile" />
       </div>
+      <hr />
       <div class="contact">
         <UserContact :currentUser="liveProfile" :contactInfo="contactInfo" />
-      </div>
-      <div>
-        <button @click="logout">Logout</button>
       </div>
     </div>
     <Modal radius="8px 8px 0 0" align="end" v-if="modal" @closeModal="closeSwitchProfile">
@@ -91,7 +106,11 @@
               width="40"
               height="40"
               style="object-fit: cover; max-width: 100%; border-radius: 4px"
+              v-if="profile.profileImage"
             />
+            <svg v-else width="100%" height="100%" viewBox="0 0 122 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path opacity="0.4" d="M61.0005 79C79.2248 79 94 61.3154 94 39.5002C94 17.6846 89.1491 0 61.0005 0C32.8518 0 28 17.6846 28 39.5002C28 61.3154 42.7752 79 61.0005 79Z" fill="#686868"></path><path opacity="0.4" d="M121.932 138.151C121.334 99.8308 116.405 88.9117 78.6861 82C78.6861 82 73.3766 88.8694 61.0014 88.8694C48.6261 88.8694 43.3157 82 43.3157 82C6.00888 88.8363 0.7801 99.5934 0.0925852 136.906C0.036209 139.953 0.0100836 140.113 0 139.759C0.00229172 140.422 0.0925852 160 0.0925852 160H61H122C122 160 121.999 141.457 122 140.807C121.99 141.026 121.97 140.602 121.932 138.151Z" fill="#686868"></path>
+            </svg>
           </div>
           <div>
             <small><strong>/{{ profile.slug }}</strong></small>
@@ -116,10 +135,6 @@
 <script setup>
 import { doc, onSnapshot } from 'firebase/firestore';
 import useFirestore from '~/composables/useFirestore.ts';
-
-  definePageMeta({
-    middleware: ['auth']
-  });
 
   const { update } = useFirestore();
   const nuxtApp = useNuxtApp();
@@ -198,3 +213,14 @@ import useFirestore from '~/composables/useFirestore.ts';
     // }).catch((err) => errCode.value = err.message);
   }
 </script>
+<style lang="scss" scoped>
+hr {
+  border-width: 6px;
+  border-image: initial;
+  border-color: inherit;
+  border-style: solid;
+  width: 100%;
+  opacity: 0.6;
+  color: #f5f5f5;
+}
+</style>

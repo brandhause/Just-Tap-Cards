@@ -17,8 +17,8 @@
           <div>
             <small><strong>Live card now</strong></small>
           </div>
-          <select name="" id="" class="w-100 py-2 border-0 border-bottom">
-            <option value="" v-for="profile in currentUser.profile" :key="profile.id">
+          <select class="w-100 py-2 border-0 border-bottom" v-model="profileId">
+            <option :value="profile.id" v-for="profile in currentUser.profile" :key="profile.id">
               {{ profile.slug }}
             </option>
           </select>
@@ -26,21 +26,40 @@
             <div
               class="d-flex align-items-stretch position-relative"
               style="border-radius: 20px"
+              @click="changeProfile(profile.id)"
             >
               <div
-                class="profile-img mx-auto"
+                class="profile-img mx-auto d-flex"
                 style="flex: 0 0 275px; height: 375px; border-radius: 20px 0 0 20px"
               >
-                <img :src="profile.profileImage" class="h-100 w-100" style="border-radius: 20px 0 0 20px" />
+                <img v-if="profile.profileImage" :src="profile.profileImage" />
+                <span v-else class="w-100 mt-auto">
+                  <svg width="100%" height="227.33333333333331" viewBox="0 0 122 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path opacity="0.4" d="M61.0005 79C79.2248 79 94 61.3154 94 39.5002C94 17.6846 89.1491 0 61.0005 0C32.8518 0 28 17.6846 28 39.5002C28 61.3154 42.7752 79 61.0005 79Z" fill="#686868"></path><path opacity="0.4" d="M121.932 138.151C121.334 99.8308 116.405 88.9117 78.6861 82C78.6861 82 73.3766 88.8694 61.0014 88.8694C48.6261 88.8694 43.3157 82 43.3157 82C6.00888 88.8363 0.7801 99.5934 0.0925852 136.906C0.036209 139.953 0.0100836 140.113 0 139.759C0.00229172 140.422 0.0925852 160 0.0925852 160H61H122C122 160 121.999 141.457 122 140.807C121.99 141.026 121.97 140.602 121.932 138.151Z" fill="#686868"></path>
+                  </svg>
+                </span>
               </div>
               <div
                 class="profile-info d-flex align-items-center text-white"
-                style="flex: 1; padding: 0 20px; background-color: #000; border-radius: 0 20px 20px 0"
+                style="flex: 1; padding: 0 20px; border-radius: 0 20px 20px 0"
+                :style="{ background: profile.theme ? profile.theme.background : '#000' }"
               >
-                <h2>
+                <h2 :style="{ color: profile.theme ? profile.theme.color : '#fff' }">
                   {{ profile.displayName }}
-                  <span class="job-title">{{ profile.jobTitle }}</span>
-                  <span v-if="profile.company"> At {{ profile.company }}</span>
+                  <br />
+                  <span
+                    style="font-weight: 400; font-size: 21px; line-height: 23px"
+                    :style="{ color: profile.theme ? profile.theme.altColor : '#fff' }"
+                  >
+                    {{ profile.jobTitle }}
+                  </span>
+                  <span
+                    style="font-weight: 400; font-size: 21px; line-height: 23px"
+                    :style="{ color: profile.theme ? profile.theme.altColor : '#fff' }"
+                    v-if="profile.company"
+                  >
+                    At {{ profile.company }}
+                  </span>
                 </h2>
               </div>
               <div
@@ -54,7 +73,7 @@
                 v-if="!profile.live"
                 class="position-absolute d-flex align-items-center justify-content-center text-white rounded-circle"
                 style="right: -20px; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; background: #686868; cursor: pointer"
-                @click="removeProfile(profile)"
+                @click.stop="removeProfile(profile)"
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd">
                   <path d="M19 24h-14c-1.104 0-2-.896-2-2v-17h-1v-2h6v-1.5c0-.827.673-1.5 1.5-1.5h5c.825 0 1.5.671 1.5 1.5v1.5h6v2h-1v17c0 1.104-.896 2-2 2zm-14-2.5c0 .276.224.5.5.5h13c.276 0 .5-.224.5-.5v-16.5h-14v16.5zm5-18.5h4v-1h-4v1z" />
@@ -64,6 +83,7 @@
           </div>
           <div class="mt-4">
             <nuxt-link
+              v-if="currentUser.profile.length < 3"
               to="/card/setup"
               class="d-flex w-100 justify-content-between border rounded"
               style="padding: 30px 16px; box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.12); font-weight: 900"
@@ -83,39 +103,60 @@
 </template>
 <script setup>
 import { onAuthStateChanged } from 'firebase/auth';
-import { doc, onSnapshot, updateDoc, arrayRemove } from 'firebase/firestore';
-  
+import { doc, onSnapshot, updateDoc, deleteDoc, arrayRemove } from 'firebase/firestore';
+import { ref as storageRef, deleteObject } from 'firebase/storage';
+import useFirestore from '~/composables/useFirestore.ts';
+
+  const { update } = useFirestore();  
   const nuxtApp = useNuxtApp();
   const currentUser = ref();
+  const liveProfile = ref();
+  const profileId = ref();
+
+  watch(() => profileId.value, (newVal, oldVal) => {
+    if (oldVal !== undefined && newVal !== oldVal) {
+      changeProfile(newVal)
+    }
+  })
 
   onMounted(async () => {
-    onAuthStateChanged(nuxtApp.$auth, (user) => {
-      if (!user) {
-        return navigateTo({
-          path: '/'
-        });
-      } else {
-        const docRef = doc(nuxtApp.$firestore, 'users', user.uid);
-
-        onSnapshot(docRef,
-          (snap) => {
-            currentUser.value = {
-              uid: user.uid,
-              ...snap.data()
-            }
-          },
-          (error) => {
-            //
-          },
-        );
-      }
-    });
+    currentUser.value = JSON.parse(localStorage.getItem('profiles'));
+    liveProfile.value = JSON.parse(localStorage.getItem('live-profile'));
+    profileId.value = liveProfile.value.id;
   })
+
+  async function changeProfile(id) {
+    const profile = currentUser.value;
+    profile.profile.forEach(async (p) => {
+      p.live = p.id === id;
+    })
+
+    await update(currentUser.value.uid, profile.profile)
+      .then((res) => {
+        if (res === 'ok') {
+          return navigateTo('/profile');
+        }
+      })
+  }
 
   async function removeProfile(profile) {
     try {
       await updateDoc(doc(nuxtApp.$firestore, 'users', currentUser.value.uid), {
         profile: arrayRemove(profile)
+      }).then(async () => {
+        const contactRef = doc(nuxtApp.$firestore, 'contact_info', profile.slug)
+        await deleteDoc(contactRef)
+          .then(() => {
+            // delete profile image if any
+            if (profile.profileImage) {
+              const imgRef = storageRef(nuxtApp.$storage, profile.profileImage);
+              deleteObject(imgRef)
+                .catch((err) => {
+                  console.log(err)
+                });
+            }
+            return navigateTo('/profile');
+          });
       })
     } catch (error) {
       console.log(error)
