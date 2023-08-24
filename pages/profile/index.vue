@@ -8,7 +8,7 @@
         </div>
         <div class="row mx-0 col-12 px-0">
           <div class="col-12 d-flex justify-content-between align-items-center">
-            <nuxt-link class="d-flex w-100" to="/">
+            <nuxt-link class="d-flex w-100" to="/my-account/change-email">
               <span class="d-flex align-items-center justify-content-center" style="height: 4rem; width: 4rem">
                 <svg stroke="#a1a1a1" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" focusable="false" class="chakra-icon css-118pdk6" height="24px" width="24px" xmlns="http://www.w3.org/2000/svg">
                   <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>

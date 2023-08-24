@@ -25,6 +25,10 @@ a {
   }
 }
 
+input:focus {
+  outline: none;
+}
+
 img {
   width: 100%;
   object-fit: cover;
