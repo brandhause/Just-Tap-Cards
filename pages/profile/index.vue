@@ -1,6 +1,7 @@
 <template>
   <div v-if="liveProfile">
     <div class="position-relative">
+      <!-- Account dialog -->
       <div class="dialog border-top px-3 py-4" v-if="dialog">
         <div class="dialog-header p-3 rounded">
           <small>{{ email }}</small>
@@ -22,7 +23,7 @@
             </svg>
           </div>
           <div class="col-12 d-flex justify-content-between align-items-center border-bottom">
-            <nuxt-link class="d-flex w-100" to="/">
+            <nuxt-link class="d-flex w-100" to="/my-account/details/password">
               <span class="d-flex align-items-center justify-content-center" style="height: 4rem; width: 4rem">
                 <svg stroke="#a1a1a1" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" focusable="false" class="chakra-icon css-118pdk6" height="24px" width="24px" xmlns="http://www.w3.org/2000/svg">
                   <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>

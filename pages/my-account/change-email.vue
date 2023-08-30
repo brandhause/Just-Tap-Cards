@@ -16,6 +16,7 @@
       </div>
       <div class="col-12 mt-4 pt-3">
         <div class="d-flex flex-column">
+          <small class="px-0" style="font-weight: 600" v-if="user.providedPassword">Current password</small>
           <input
             class="border-0 border-bottom"
             type="password"
@@ -28,6 +29,7 @@
       </div>
       <div class="col-12 mt-4 pt-3">
         <div class="d-flex flex-column">
+          <small class="px-0" style="font-weight: 600" v-if="user.providedEmail">New email</small>
           <input
             class="border-0 border-bottom"
             type="email"
@@ -119,13 +121,6 @@ import { onAuthStateChanged, updateEmail, reauthenticateWithCredential, EmailAut
           setTimeout(() => {
             alert.value.state = null;
           }, 3000);
-        } else if (user.value.providedEmail.match('\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b')) {
-          alert.value.state = 'error';
-          alert.value.title = 'Something went Wrong!'
-          alert.value.message = 'Invalid email!';
-          setTimeout(() => {
-            alert.value.state = null;
-          }, 3000);
         } else {
           // update email
           updateEmail(authUser, user.value.providedEmail)
@@ -133,6 +128,9 @@ import { onAuthStateChanged, updateEmail, reauthenticateWithCredential, EmailAut
               alert.value.state = 'success';
               alert.value.title = 'success';
               alert.value.message = 'Email successfully Updated!';
+              setTimeout(() => {
+                alert.value.state = null;
+              }, 3000);
             })
             .catch((error) => {
               alert.value.state = 'error';
